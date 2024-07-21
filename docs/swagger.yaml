@@ -22,20 +22,37 @@ definitions:
     type: object
   controller.RegisterInput:
     properties:
+      age:
+        type: integer
+      country:
+        type: string
       email:
         type: string
+      firstname:
+        type: string
+      hobbies:
+        type: string
+      lastname:
+        type: string
       password:
+        type: string
+      sex:
         type: string
       username:
         type: string
     required:
+    - age
+    - country
     - email
+    - firstname
+    - lastname
     - password
+    - sex
     - username
     type: object
-  utils.MessageResponse:
+  utils.ModelResponse:
     properties:
-      message:
+      Model fields:
         type: string
     type: object
 externalDocs:
@@ -118,7 +135,7 @@ paths:
       summary: Register a new user
       tags:
       - auth
-  /u/profile:
+  /u/profile/{username}:
     get:
       consumes:
       - application/json
@@ -128,13 +145,17 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: Username
+        in: path
+        name: username
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils.MessageResponse'
+            $ref: '#/definitions/utils.ModelResponse'
       summary: User profile
 securityDefinitions:
   JWT:

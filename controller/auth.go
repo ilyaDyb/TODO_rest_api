@@ -11,9 +11,15 @@ import (
 )
 
 type RegisterInput struct {
-	Username string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username  string `json:"username" binding:"required"`
+	Email     string `json:"email" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	Firstname string `json:"firstname" binding:"required"`
+	Lastname  string `json:"lastname" binding:"required"`
+	Sex       string `json:"sex" binding:"required"`
+	Age       uint8  `json:"age" binding:"required"`
+	Country   string `json:"country" binding:"required"`
+	Hobbies   string `json:"hobbies"`
 }
 
 type LoginInput struct {
@@ -42,16 +48,19 @@ func Register(c *gin.Context) {
 		log.Println("Error when retrieving data")
 		return
 	}
-	var existingUser models.User
-	if err := config.DB.Where("username = ?", input.Username).First(&existingUser).Error; err == nil {
+	if !utils.IsValidUsernameEmail(input.Username, input.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Username or email already exists"})
 		return
 	}
-	if err := config.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username or email already exists"})
+	if !utils.IsValidPassword(input.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must be >= 8 chars long and contain number"})
 		return
 	}
-	user := models.User{Username: input.Username, Role: "user", Email: input.Email}
+	user := models.User{
+		Username: input.Username, Role: "user", Email: input.Email, Sex: input.Sex,
+		Age: input.Age, Country: input.Country, Hobbies: input.Hobbies,
+		Firstname: input.Firstname, Lastname: input.Lastname,
+	}
 	if err := user.HashPassword(input.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Println("Error when hashing password")

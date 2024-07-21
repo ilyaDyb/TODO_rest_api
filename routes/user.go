@@ -20,6 +20,6 @@ func UserRoute(router *gin.Engine) {
 	authorized := router.Group("/u")
 	authorized.Use(middleware.JWTAuthMiddleware())
 	{
-		authorized.GET("/profile", controller.ProfileController)
+		authorized.GET("/profile/:username", controller.ProfileController)
 	}
 }

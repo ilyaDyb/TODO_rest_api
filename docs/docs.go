@@ -122,7 +122,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/u/profile": {
+        "/u/profile/{username}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -138,13 +138,19 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Username",
+                        "name": "username",
+                        "in": "path"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.MessageResponse"
+                            "$ref": "#/definitions/utils.ModelResponse"
                         }
                     }
                 }
@@ -186,15 +192,38 @@ const docTemplate = `{
         "controller.RegisterInput": {
             "type": "object",
             "required": [
+                "age",
+                "country",
                 "email",
+                "firstname",
+                "lastname",
                 "password",
+                "sex",
                 "username"
             ],
             "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "country": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
+                "firstname": {
+                    "type": "string"
+                },
+                "hobbies": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "sex": {
                     "type": "string"
                 },
                 "username": {
@@ -202,10 +231,10 @@ const docTemplate = `{
                 }
             }
         },
-        "utils.MessageResponse": {
+        "utils.ModelResponse": {
             "type": "object",
             "properties": {
-                "message": {
+                "Model fields": {
                     "type": "string"
                 }
             }

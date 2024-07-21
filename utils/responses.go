@@ -10,3 +10,7 @@ type MessageResponse struct {
 type ErrorResponse struct {
     Error string `json:"error"`
 }
+
+type ModelResponse struct {
+    Model string `json:"Model fields"`
+}
