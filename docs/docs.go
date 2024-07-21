@@ -76,7 +76,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/register": {
+        "/auth/registration": {
             "post": {
                 "description": "Register a new user by providing a username and password.",
                 "consumes": [
@@ -92,7 +92,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Register Input",
-                        "name": "registerInput",
+                        "name": "RegisterInput",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -186,10 +186,14 @@ const docTemplate = `{
         "controller.RegisterInput": {
             "type": "object",
             "required": [
+                "email",
                 "password",
                 "username"
             ],
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },

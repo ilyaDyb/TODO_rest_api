@@ -22,11 +22,14 @@ definitions:
     type: object
   controller.RegisterInput:
     properties:
+      email:
+        type: string
       password:
         type: string
       username:
         type: string
     required:
+    - email
     - password
     - username
     type: object
@@ -85,7 +88,7 @@ paths:
       summary: Login a user
       tags:
       - auth
-  /auth/register:
+  /auth/registration:
     post:
       consumes:
       - application/json
@@ -93,7 +96,7 @@ paths:
       parameters:
       - description: Register Input
         in: body
-        name: registerInput
+        name: RegisterInput
         required: true
         schema:
           $ref: '#/definitions/controller.RegisterInput'

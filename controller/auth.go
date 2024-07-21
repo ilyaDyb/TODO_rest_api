@@ -8,22 +8,21 @@ import (
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/utils"
-
 )
 
 type RegisterInput struct {
-    Username string `json:"username" binding:"required"`
-    Password string `json:"password" binding:"required"`
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type LoginInput struct {
-    Username string `json:"username" binding:"required"`
-    Password string `json:"password" binding:"required"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type MessageResponse = utils.MessageResponse
 type ErrorResponse = utils.ErrorResponse
-
 
 // Register godoc
 // @Summary      Register a new user
@@ -31,11 +30,11 @@ type ErrorResponse = utils.ErrorResponse
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        registerInput  body      RegisterInput  true  "Register Input"
+// @Param        RegisterInput  body      RegisterInput  true  "Register Input"
 // @Success      200            {object}  MessageResponse
 // @Failure      400            {object}  ErrorResponse
 // @Failure      500            {object}  ErrorResponse
-// @Router       /auth/register [post]
+// @Router       /auth/registration [post]
 func Register(c *gin.Context) {
 	var input RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -43,7 +42,16 @@ func Register(c *gin.Context) {
 		log.Println("Error when retrieving data")
 		return
 	}
-	user := models.User{Username: input.Username}
+	var existingUser models.User
+	if err := config.DB.Where("username = ?", input.Username).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username or email already exists"})
+		return
+	}
+	if err := config.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username or email already exists"})
+		return
+	}
+	user := models.User{Username: input.Username, Role: "user", Email: input.Email}
 	if err := user.HashPassword(input.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Println("Error when hashing password")
