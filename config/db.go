@@ -33,4 +33,5 @@ func Connect() {
         panic("failed to connect database: " + err.Error())
     }
     DB.AutoMigrate(&models.User{})
+    DB.AutoMigrate(&models.Photo{})
 }

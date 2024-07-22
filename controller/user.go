@@ -1,14 +1,17 @@
 package controller
 
 import (
+	// "log"
+	"fmt"
+	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
-	"github.com/ilyaDyb/go_rest_api/utils"
 	_ "github.com/ilyaDyb/go_rest_api/utils"
 )
 
@@ -24,7 +27,6 @@ import (
 // @Router   /u/profile/{username} [get]
 func ProfileController(c *gin.Context) {
 	username := c.Param("username")
-
 	username = username[1:]
 	if username == "" || username == "/" {
 		usernameFromToken, exists := c.Get("username")
@@ -35,7 +37,7 @@ func ProfileController(c *gin.Context) {
 		username = usernameFromToken.(string)
 	}
 	var user models.User
-	if err := config.DB.Table("users").Where("username = ?", username).First(&user).Error; err != nil {
+	if err := config.DB.Preload("Photo").Where("username = ?", username).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -43,13 +45,13 @@ func ProfileController(c *gin.Context) {
 }
 
 type ChangeProfileInput struct {
-	Firstname string                `json:"firstname"`
-	Lastname  string                `json:"lastname"`
-	Age       uint8                 `json:"age" binding:"min=18,max=99"`
-	Country   string                `json:"country"`
-	Bio       string                `json:"bio"`
-	Hobbies   string                `json:"hobbies"`
-	Photo     *multipart.FileHeader `json:"photo"`
+	Firstname string                `form:"firstname"`
+	Lastname  string                `form:"lastname"`
+	Age       uint8                 `form:"age"`
+	Country   string                `form:"country"`
+	Bio       string                `form:"bio"`
+	Hobbies   string                `form:"hobbies"`
+	Photo     *multipart.FileHeader `form:"photo"`
 }
 
 // EditProfileController edits user profile
@@ -72,37 +74,23 @@ type ChangeProfileInput struct {
 // @Failure 500 {object} utils.ErrorResponse
 // @Router /u/profile [put]
 func EditProfileController(c *gin.Context) {
-	currentUsername := c.MustGet("username")
-	file, err := c.FormFile("photo")
-	if err != nil {
-		if err.Error() != "http: no such file" {
-			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
-			return
-		}
-	}
-	if !utils.IsValidPhotoExt(file.Filename) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid extension"})
-		return
-	}
-
-	filename := filepath.Base(file.Filename)
-	filepath := filepath.Join(config.UserPhotoPath, filename)
-	if err := c.SaveUploadedFile(file, filepath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
+	currentUsername := c.MustGet("username").(string)
 	var input ChangeProfileInput
+	var user models.User
+
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var user models.User
 	if err := config.DB.Table("users").Where("username = ?", currentUsername).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+
+	fmt.Printf("Input: %+v\n", input)
+
+	// Update user's profile fields
 	user.Firstname = input.Firstname
 	user.Lastname = input.Lastname
 	user.Age = input.Age
@@ -110,18 +98,30 @@ func EditProfileController(c *gin.Context) {
 	user.Bio = input.Bio
 	user.Hobbies = input.Hobbies
 
-	photo := models.Photo{
-		UserID: uint(user.ID),
-		URL:    filepath,
+	file, err := c.FormFile("photo")
+	if err == nil {
+		if _, err := os.Stat(config.UserPhotoPath); os.IsNotExist(err) {
+			os.MkdirAll(config.UserPhotoPath, os.ModePerm)
+		}
+
+		filePath := filepath.Join(config.UserPhotoPath, fmt.Sprintf("%d_%s", user.Id, file.Filename))
+		log.Println(filePath)
+		if err := c.SaveUploadedFile(file, filePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save file"})
+			return
+		}
+		photo := models.Photo{
+			UserID: user.ID,
+			URL:    filePath,
+		}
+		config.DB.Create(&photo)
+		user.Photo = photo
 	}
-	if err := config.DB.Create(&photo).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if err := config.DB.Model(&user).Updates(user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to update user profile"})
 		return
 	}
 
-	if err := config.DB.Save(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusAccepted, gin.H{"message": "Profile updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully"})
 }
