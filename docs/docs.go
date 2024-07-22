@@ -122,6 +122,139 @@ const docTemplate = `{
                 }
             }
         },
+        "/u/profile": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "User profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "With the Bearer started",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ModelResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit user profile details including uploading a profile photo",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Edit user profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "With the Bearer started",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "First Name",
+                        "name": "firstname",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Last Name",
+                        "name": "lastname",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Age",
+                        "name": "age",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Country",
+                        "name": "country",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bio",
+                        "name": "bio",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Hobbies",
+                        "name": "hobbies",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Profile Photo",
+                        "name": "photo",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/utils.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/u/profile/{username}": {
             "get": {
                 "consumes": [
@@ -151,6 +284,18 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/utils.ModelResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
                         }
                     }
                 }
@@ -203,7 +348,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 99,
+                    "minimum": 18
                 },
                 "country": {
                     "type": "string"
@@ -227,6 +374,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

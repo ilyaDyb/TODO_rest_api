@@ -1,0 +1,3 @@
++ need return profile for current user if path have not this param
++ think about get user from token, not path
+- Fix bugs in EditProfileController

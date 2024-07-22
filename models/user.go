@@ -40,5 +40,4 @@ type Photo struct {
 	gorm.Model
 	UserID    uint   `gorm:"index"`
 	URL       string `json:"url"`
-	IsPreview bool   `json:"isPreview"`
 }

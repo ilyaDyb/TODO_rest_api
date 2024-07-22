@@ -23,6 +23,8 @@ definitions:
   controller.RegisterInput:
     properties:
       age:
+        maximum: 99
+        minimum: 18
         type: integer
       country:
         type: string
@@ -49,6 +51,16 @@ definitions:
     - password
     - sex
     - username
+    type: object
+  utils.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  utils.MessageResponse:
+    properties:
+      message:
+        type: string
     type: object
   utils.ModelResponse:
     properties:
@@ -135,6 +147,94 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /u/profile:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ModelResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: User profile
+    put:
+      consumes:
+      - multipart/form-data
+      description: Edit user profile details including uploading a profile photo
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: First Name
+        in: formData
+        name: firstname
+        type: string
+      - description: Last Name
+        in: formData
+        name: lastname
+        type: string
+      - description: Age
+        in: formData
+        name: age
+        type: integer
+      - description: Country
+        in: formData
+        name: country
+        type: string
+      - description: Bio
+        in: formData
+        name: bio
+        type: string
+      - description: Hobbies
+        in: formData
+        name: hobbies
+        type: string
+      - description: Profile Photo
+        in: formData
+        name: photo
+        type: file
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/utils.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Edit user profile
   /u/profile/{username}:
     get:
       consumes:
@@ -156,6 +256,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/utils.ModelResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
       summary: User profile
 securityDefinitions:
   JWT:

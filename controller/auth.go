@@ -17,7 +17,7 @@ type RegisterInput struct {
 	Firstname string `json:"firstname" binding:"required"`
 	Lastname  string `json:"lastname" binding:"required"`
 	Sex       string `json:"sex" binding:"required"`
-	Age       uint8  `json:"age" binding:"required"`
+	Age       uint8  `json:"age" binding:"required,min=18,max=99"`
 	Country   string `json:"country" binding:"required"`
 	Hobbies   string `json:"hobbies"`
 }

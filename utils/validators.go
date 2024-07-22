@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strings"
 	"unicode"
 
 	"github.com/ilyaDyb/go_rest_api/config"
@@ -30,4 +31,17 @@ func IsValidUsernameEmail(username string, email string) bool {
 		return false
 	}
 	return true
+}
+
+func IsValidPhotoExt(filename string) bool {
+	validExtensions := []string{"png", "jpg", "jpeg", "webp"}
+	extension := strings.Split(filename, ".")[1]
+	valid := false
+	for _, ext := range(validExtensions) {
+		if ext == extension {
+			valid = true
+			break
+		}
+	}
+	return valid
 }

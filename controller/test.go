@@ -76,7 +76,7 @@ func UploadFile(c *gin.Context) {
 	}
 	// log.Println(file.Filename, time.Now())
 	// dst := fmt.Sprint("users/", config.UploadPath)
-	dst := fmt.Sprintf("%s%s", config.UploadPath, file.Filename)
+	dst := fmt.Sprintf("%s%s", config.DefaultUploadPath, file.Filename)
 	log.Println(dst, time.Now())
 	// log.Println(dst)
 	c.SaveUploadedFile(file, dst)

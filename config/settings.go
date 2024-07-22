@@ -1,5 +1,6 @@
 package config
 
 const (
-	UploadPath = "./uploads/"
+	DefaultUploadPath = "./uploads/"
+	UserPhotoPath = DefaultUploadPath + "user_photos/"
 )
