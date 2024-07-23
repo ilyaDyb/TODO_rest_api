@@ -8,7 +8,7 @@
     - Social Authentication: Possibility of registering and logging in via social networks (eg Facebook, Google).
 2. Profile creation and management
     + Profile Information: Users can add detailed information about themselves such as biography, interests, age, location, gender.
-    +- Photos: Ability to upload and manage profile photos.
+    + Photos: Ability to upload and manage profile photos.
 3. Search and selection of pairs
     - Recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
     - Swipe functionality: Ability to swipe profiles (left or right), expressing interest or refusal.

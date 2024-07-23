@@ -5,6 +5,13 @@ definitions:
       error:
         type: string
     type: object
+  controller.LocationInput:
+    properties:
+      lat:
+        type: number
+      lon:
+        type: number
+    type: object
   controller.LoginInput:
     properties:
       password:
@@ -214,8 +221,8 @@ paths:
       produces:
       - application/json
       responses:
-        "202":
-          description: Accepted
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/utils.MessageResponse'
         "400":
@@ -265,6 +272,61 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: User profile
+  /u/save-location:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 'Location with lat, lon '
+        in: body
+        name: LocationInput
+        required: true
+        schema:
+          $ref: '#/definitions/controller.LocationInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Save location
+  /u/set-as-preview/{photo_id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id for photo which you want to set as privew
+        in: path
+        name: photo_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Set as preview
 securityDefinitions:
   JWT:
     type: basic

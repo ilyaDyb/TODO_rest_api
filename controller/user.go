@@ -67,7 +67,7 @@ type ChangeProfileInput struct {
 // @Param bio formData string false "Bio"
 // @Param hobbies formData string false "Hobbies"
 // @Param photo formData file false "Profile Photo"
-// @Success 202 {object} utils.MessageResponse
+// @Success 200 {object} utils.MessageResponse
 // @Failure 400 {object} utils.ErrorResponse
 // @Failure 403 {object} utils.ErrorResponse
 // @Failure 404 {object} utils.ErrorResponse
@@ -115,7 +115,7 @@ func EditProfileController(c *gin.Context) {
 			URL:    filePath,
 		}
 		config.DB.Create(&photo)
-		user.Photo = photo
+		user.Photo = append(user.Photo, photo)
 	}
 
 	if err := config.DB.Model(&user).Updates(user).Error; err != nil {
@@ -124,4 +124,81 @@ func EditProfileController(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully"})
+}
+
+// SetAsPriview change user preview photo
+// @Summary Set as preview
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "With the Bearer started"
+// @Param photo_id path uint true "Id for photo which you want to set as privew"
+// @Success 200 {object} utils.MessageResponse
+// @Failure 500 {object} utils.ErrorResponse
+// @Router /u/set-as-preview/{photo_id} [put]
+func SetAsPriview(c *gin.Context) {
+	username := c.MustGet("username").(string)
+	photoId := c.Param("photo_id")
+
+	var user models.User
+	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil { 
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	tx := config.DB.Begin()
+	
+	if err := tx.Model(&models.Photo{}).Where("id = ? AND user_id = ?", photoId, user.Id).Update("is_preview", true).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	if err := tx.Model(&models.Photo{}).Where("user_id = ? AND id != ?", user.Id, photoId).Update("is_preview", false).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	tx.Commit()
+
+	c.JSON(http.StatusOK, gin.H{"message": "Changed preview photo"})
+}
+
+type LocationInput struct {
+	Lat float32 `json:"lat"`
+	Lon float32 `json:"lon"`
+}
+
+// @Summary      Save location
+// @Accept       json
+// @Produce      json
+// @Param Authorization header string true "With the Bearer started"
+// @Param        LocationInput  body      LocationInput  true  "Location with lat, lon "
+// @Success      200         {object}  utils.MessageResponse
+// @Failure      500         {object}  utils.ErrorResponse
+// @Router       /u/save-location [post]
+func SaveLocation(c *gin.Context) {
+	username := c.MustGet("username").(string)
+	var input LocationInput
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	var user models.User
+	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	
+	tx := config.DB.Begin()
+	if err := config.DB.Model(&user).UpdateColumn("lat", input.Lat).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save location"})
+		return
+	}
+	if err := config.DB.Model(&user).UpdateColumn("lon", input.Lon).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save location"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Location saved successfully"})
 }

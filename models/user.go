@@ -7,20 +7,21 @@ import (
 
 type User struct {
 	gorm.Model
-	Id        uint   `json:"id" gorm:"primary_key"`
-	Username  string `json:"name" gorm:"unique"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Sex       string `json:"sex"`
-	Age       uint8  `json:"age"`
-	Country   string `json:"country"`
-	Location  string `json:"location"`
-	Role      string `json:"role"`
-	Bio       string `json:"bio"`
-	Hobbies   string `json:"hobbies"`
-	Photo     Photo  `json:"photo" gorm:"foreignKey:UserID"`
+	Id        uint    `json:"id" gorm:"primary_key"`
+	Username  string  `json:"name" gorm:"unique"`
+	Email     string  `json:"email"`
+	Password  string  `json:"-"`
+	Firstname string  `json:"firstname"`
+	Lastname  string  `json:"lastname"`
+	Sex       string  `json:"sex"`
+	Age       uint8   `json:"age"`
+	Country   string  `json:"country"`
+	Lat       float32 `json:"lat"`
+	Lon       float32 `json:"lon"`
+	Role      string  `json:"role"`
+	Bio       string  `json:"bio"`
+	Hobbies   string  `json:"hobbies"`
+	Photo     []Photo `json:"photo" gorm:"foreignKey:UserID"`
 }
 
 func (u *User) HashPassword(password string) error {
@@ -38,6 +39,7 @@ func (u *User) CheckPassword(password string) error {
 
 type Photo struct {
 	gorm.Model
-	UserID uint   `json:"user_id" gorm:"index"`
-	URL    string `json:"url"`
+	UserID    uint   `json:"user_id" gorm:"index"`
+	URL       string `json:"url"`
+	IsPreview bool   `json:"is_preview"`
 }
