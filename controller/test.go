@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ilyaDyb/go_rest_api/config"
+	// "github.com/ilyaDyb/go_rest_api/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -97,4 +98,26 @@ func TestingValidate(c *gin.Context)  {
 		log.Println(person.UnixTime)
 	}
 	c.String(http.StatusOK, "Success")
+}
+
+func TestQueries(c *gin.Context) {
+	// all photo
+	// var allPhoto []models.Photo
+	// config.DB.Find(&allPhoto)
+	// c.JSON(http.StatusOK, allPhoto)
+
+	//all photo for special user
+	// var allPhotoForSpecialUser []models.Photo
+	// var user models.User
+	// config.DB.Where("username = ?", "wicki").First(&user)
+	// UserID := user.Id
+	// config.DB.Where("user_id = ?", UserID).Find(&allPhotoForSpecialUser)
+	// c.JSON(http.StatusOK, allPhotoForSpecialUser)
+
+	// All users with their photos
+	// var allUsers []models.User
+	// config.DB.Preload("Photo").Find(&allUsers)
+	// c.JSON(http.StatusOK, allUsers)
+
+	return
 }

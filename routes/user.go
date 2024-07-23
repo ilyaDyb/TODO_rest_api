@@ -15,6 +15,7 @@ func TestRoute(router *gin.Engine) {
 	router.MaxMultipartMemory = 8 << 20
 	router.POST("/upload", controller.UploadFile)
 	router.GET("/testing", controller.TestingValidate)
+	router.GET("/test/queries", controller.TestQueries)
 }
 func UserRoute(router *gin.Engine) {
 	authorized := router.Group("/u")

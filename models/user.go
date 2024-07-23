@@ -38,6 +38,6 @@ func (u *User) CheckPassword(password string) error {
 
 type Photo struct {
 	gorm.Model
-	UserID uint   `gorm:"index"`
+	UserID uint   `json:"user_id" gorm:"index"`
 	URL    string `json:"url"`
 }
