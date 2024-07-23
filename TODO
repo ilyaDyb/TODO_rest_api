@@ -3,20 +3,20 @@
 + Fix bugs in EditProfileController
 + test photo model
 1. Registration and authorization of users:
-    *  + Registration: Users can register by providing their basic information such as name, email address, phone number and creating a password.
-    *  + Authorization: Users can log in using registered credentials.
-    * Social Authentication: Possibility of registering and logging in via social networks (eg Facebook, Google).
+    + Registration: Users can register by providing their basic information such as name, email address, phone number and creating a password.
+    + Authorization: Users can log in using registered credentials.
+    - Social Authentication: Possibility of registering and logging in via social networks (eg Facebook, Google).
 2. Profile creation and management
-    * + Profile Information: Users can add detailed information about themselves such as biography, interests, age, location, gender.
-    * +- Photos: Ability to upload and manage profile photos.
+    + Profile Information: Users can add detailed information about themselves such as biography, interests, age, location, gender.
+    +- Photos: Ability to upload and manage profile photos.
 3. Search and selection of pairs
-    * Recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
-    * Swipe functionality: Ability to swipe profiles (left or right), expressing interest or refusal.
+    - Recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
+    - Swipe functionality: Ability to swipe profiles (left or right), expressing interest or refusal.
 4. User interaction
-    * Messages: Built-in messaging system for communication between matched users (matches).
-    * Notifications: Push notifications and in-app notifications for new messages, matches and likes.
+    - Messages: Built-in messaging system for communication between matched users (matches).
+    - Notifications: Push notifications and in-app notifications for new messages, matches and likes.
 5. Additional features
-    * Geolocation: Using location to match nearby matches.
-    * Subscriptions and Premium Features: Paid features such as unlimited likes, the ability to see who has viewed a profile, and Rewind.
+    - Geolocation: Using location to match nearby matches.
+    - Subscriptions and Premium Features: Paid features such as unlimited likes, the ability to see who has viewed a profile, and Rewind.
 6. User Interface and Experience (UI/UX)
-    * Intuitive Design: Easy to use and attractive interface for improved user experience.
+    - Intuitive Design: Easy to use and attractive interface for improved user experience.
