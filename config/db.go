@@ -1,14 +1,14 @@
 package config
 
 import (
-    "log"
-    "os"
-    "strings"
+	"log"
+	"os"
+	"strings"
 
-    "github.com/ilyaDyb/go_rest_api/models"
-    "github.com/joho/godotenv"
-    "gorm.io/driver/postgres"
-    "gorm.io/gorm"
+	"github.com/ilyaDyb/go_rest_api/models"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB

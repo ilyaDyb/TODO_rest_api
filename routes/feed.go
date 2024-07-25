@@ -11,5 +11,6 @@ func FeedRoute(router *gin.Engine) {
 	authorized.Use(middleware.JWTAuthMiddleware())
 	{
 		authorized.POST("/grade", controller.GradeProfile)
+		authorized.GET("/get-profiles", controller.GetProfiles)
 	}
 }

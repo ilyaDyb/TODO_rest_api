@@ -115,17 +115,24 @@ func TestQueries(c *gin.Context) {
 	// c.JSON(http.StatusOK, allPhotoForSpecialUser)
 
 	// All users with their photos
-	// var allUsers []models.User
-	// config.DB.Preload("Photo").Find(&allUsers)
-	// config.DB.Find(&allUsers)
-	// c.JSON(http.StatusOK, allUsers)
+	var allUsers []models.User
+	config.DB.Preload("Photo").Find(&allUsers)
+	config.DB.Find(&allUsers)
+	// for _, usr := range allUsers {
+	// 	usr.Sex = "male"
+	// 	config.DB.Save(&usr)
+	// }
+	// config.DB.Save(&allUsers)
+	c.JSON(http.StatusOK, allUsers)
 
 	//All interaction
-	var usr models.User
-	config.DB.Where("username = ?", "test107").First(&usr)
+	// var usr models.User
+	// config.DB.Where("username = ?", "wicki").First(&usr)
+	// usr.Sex = "female"
+	// config.DB.Save(&usr)
 	// var interactions []models.UserInteraction
 	// config.DB.Model(models.UserInteraction{}).Where("user_id = ?", usr.Id).Find(&interactions)
 	// c.JSON(http.StatusOK, gin.H{"count": len(interactions), "interactions": interactions})
-	c.JSON(http.StatusOK, usr)
+	// c.JSON(http.StatusOK, usr)
 	return
 }

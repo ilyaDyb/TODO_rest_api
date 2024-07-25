@@ -161,6 +161,20 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /feed/get-profiles:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Get profile
   /feed/grade:
     post:
       consumes:
