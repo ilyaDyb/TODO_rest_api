@@ -122,6 +122,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/feed/grade": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "to Grade profiles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "With the Bearer started",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Input for Grade other profile",
+                        "name": "InputGrade",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.InputGrade"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/u/profile": {
             "get": {
                 "consumes": [
@@ -392,6 +422,17 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.InputGrade": {
+            "type": "object",
+            "properties": {
+                "interType": {
+                    "type": "string"
+                },
+                "targetID": {
+                    "type": "integer"
                 }
             }
         },

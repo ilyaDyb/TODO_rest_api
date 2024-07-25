@@ -34,4 +34,5 @@ func Connect() {
     }
     DB.AutoMigrate(&models.User{})
     DB.AutoMigrate(&models.Photo{})
+    DB.AutoMigrate(&models.UserInteraction{})
 }

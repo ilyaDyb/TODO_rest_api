@@ -56,6 +56,10 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must be >= 8 chars long and contain number"})
 		return
 	}
+	if !utils.IsValidEmailFormat(input.Email) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email format is invalid"})
+		return
+	}
 	user := models.User{
 		Username: input.Username, Role: "user", Email: input.Email, Sex: input.Sex,
 		Age: input.Age, Country: input.Country, Hobbies: input.Hobbies,

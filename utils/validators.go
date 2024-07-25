@@ -45,3 +45,16 @@ func IsValidPhotoExt(filename string) bool {
 	}
 	return valid
 }
+
+func IsValidEmailFormat(email string) bool {
+	if len(email) <= 5 {
+		return false
+	}
+	if strings.Count(email, "@") != 1 {
+		return false
+	}
+	if !strings.Contains(strings.Split(email, "@")[1], ".") {
+		return false
+	}
+	return true
+}

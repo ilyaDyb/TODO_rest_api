@@ -5,6 +5,13 @@ definitions:
       error:
         type: string
     type: object
+  controller.InputGrade:
+    properties:
+      interType:
+        type: string
+      targetID:
+        type: integer
+    type: object
   controller.LocationInput:
     properties:
       lat:
@@ -154,6 +161,26 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /feed/grade:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Input for Grade other profile
+        in: body
+        name: InputGrade
+        required: true
+        schema:
+          $ref: '#/definitions/controller.InputGrade'
+      produces:
+      - application/json
+      responses: {}
+      summary: to Grade profiles
   /u/profile:
     get:
       consumes:

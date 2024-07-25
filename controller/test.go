@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ilyaDyb/go_rest_api/config"
-	// "github.com/ilyaDyb/go_rest_api/models"
+	"github.com/ilyaDyb/go_rest_api/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -117,7 +117,15 @@ func TestQueries(c *gin.Context) {
 	// All users with their photos
 	// var allUsers []models.User
 	// config.DB.Preload("Photo").Find(&allUsers)
+	// config.DB.Find(&allUsers)
 	// c.JSON(http.StatusOK, allUsers)
 
+	//All interaction
+	var usr models.User
+	config.DB.Where("username = ?", "test107").First(&usr)
+	// var interactions []models.UserInteraction
+	// config.DB.Model(models.UserInteraction{}).Where("user_id = ?", usr.Id).Find(&interactions)
+	// c.JSON(http.StatusOK, gin.H{"count": len(interactions), "interactions": interactions})
+	c.JSON(http.StatusOK, usr)
 	return
 }
