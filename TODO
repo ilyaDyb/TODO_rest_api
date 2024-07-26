@@ -3,6 +3,10 @@
 + Fix bugs in EditProfileController
 + test photo model
 + validate email
+
+- Big work for location between different users:
+    - Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
+    
 1. Registration and authorization of users:
     + Registration: Users can register by providing their basic information such as name, email address, phone number and creating a password.
     + Authorization: Users can log in using registered credentials.
@@ -11,8 +15,7 @@
     + Profile Information: Users can add detailed information about themselves such as biography, interests, age, location, gender.
     + Photos: Ability to upload and manage profile photos.
 3. Search and selection of pairs
-    - For now just give out profiles
-    - Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
+    + For now just give out profiles
     + Swipe functionality: Ability to swipe profiles (left or right), expressing interest or refusal.
     - Add chat for 2 user which liked each other.
     - Display user's likes or not, idk.
