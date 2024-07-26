@@ -19,7 +19,7 @@
     - Display users which liked me (current user) and add logic for response interaction.
     + Think about limit for unsubscribed users (10 for ex)
     + get profile without pagination
-    - get profile with pagination
+    +- get profile with pagination
 4. User interaction
     - Messages: Built-in messaging system for communication between matched users (matches).
     - Notifications: Push notifications and in-app notifications for new messages, matches and likes.

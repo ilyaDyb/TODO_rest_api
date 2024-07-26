@@ -30,7 +30,7 @@ func GetUsersList(userID uint, role string, paginator *pagination.Paginator) []m
 		gender = "male"
 	}
 
-	q := config.DB.Model(&models.User{}).
+	q := config.DB.Preload("Photo").Model(&models.User{}).
 		Where("role = ?", role).
 		Where("id != ?", userID).
 		Where("age BETWEEN ? and ?", ageLower, ageUpper).
