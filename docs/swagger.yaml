@@ -36,6 +36,8 @@ definitions:
     type: object
   controller.RegisterInput:
     properties:
+      City:
+        type: string
       age:
         maximum: 99
         minimum: 18
@@ -57,6 +59,7 @@ definitions:
       username:
         type: string
     required:
+    - City
     - age
     - country
     - email
@@ -195,6 +198,28 @@ paths:
       - application/json
       responses: {}
       summary: to Grade profiles
+  /u/liked-by-users:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Url for getting users which liked me
   /u/profile:
     get:
       consumes:
@@ -368,6 +393,28 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Set as preview
+  /u/set-coordinates:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Save location
 securityDefinitions:
   JWT:
     type: basic

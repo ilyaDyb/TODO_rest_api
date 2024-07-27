@@ -46,7 +46,7 @@ func GetUsersList(userID uint, role string, paginator *pagination.Paginator) []m
 }
 
 type usersListResponse struct {
-	Result    bool                 `json:"result"`
+	Result     bool                 `json:"result"`
 	Users      []models.User        `json:"users"`
 	Pagination *pagination.PageInfo `json:"pagination"`
 }
@@ -63,12 +63,12 @@ func GetProfiles(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
 		return
 	}
-	userID := user.Id
+	userID := user.ID
 	paginator, err := pagination.New(pagination.Options{
-		GinContext:    c,
-		DB:            config.DB,
-		Model:         &models.User{},
-		Limit:         2,
+		GinContext: c,
+		DB:         config.DB,
+		Model:      &models.User{},
+		Limit:      2,
 		CustomRequest: &pagination.RequestOptions{
 			Cursor: func(c *gin.Context) (query string) {
 				return c.Query("cursor")
@@ -90,8 +90,8 @@ func GetProfiles(c *gin.Context) {
 	users := GetUsersList(userID, "user", paginator)
 
 	c.JSON(http.StatusOK, usersListResponse{
-		Result: true,
-		Users: users,
+		Result:     true,
+		Users:      users,
 		Pagination: paginator.PageInfo,
 	})
 }
@@ -131,14 +131,14 @@ func GradeProfile(c *gin.Context) {
 	targetId := input.TargetID
 	var interaction models.UserInteraction
 	interaction.TargetID = targetId
-	interaction.UserID = curUser.Id
+	interaction.UserID = curUser.ID
 	interaction.InteractionType = InterType
 	if err := config.DB.Create(&interaction).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 	var countOfInteraction int64
-	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", curUser.Id).Count(&countOfInteraction)
+	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", curUser.ID).Count(&countOfInteraction)
 	// Check if the user is subscribed if not
 	// if subscriber {limit = 100} else {limit = 10} countOfInteraction%limit == 0 && != 0
 	if countOfInteraction%10 == 0 && countOfInteraction != 0 {

@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Id             uint      `json:"id" gorm:"primary_key"`
+	// Id             uint      `json:"id" gorm:"primary_key"`
 	Username       string    `json:"name" gorm:"unique"`
 	Email          string    `json:"email"`
 	Password       string    `json:"-"`
@@ -18,6 +18,7 @@ type User struct {
 	Sex            string    `json:"sex"`
 	Age            uint8     `json:"age"`
 	Country        string    `json:"country"`
+	City           string    `json:"city"`
 	Lat            float32   `json:"lat"`
 	Lon            float32   `json:"lon"`
 	Role           string    `json:"role"`
@@ -49,7 +50,7 @@ type Photo struct {
 
 type UserInteraction struct {
 	gorm.Model
-	UserID     uint   `json:"user_id" gorm:"uniqueIndex:idx_user_target"`
-	TargetID   uint   `json:"target_id" gorm:"uniqueIndex:idx_user_target"`
+	UserID          uint   `json:"user_id" gorm:"uniqueIndex:idx_user_target"`
+	TargetID        uint   `json:"target_id" gorm:"uniqueIndex:idx_user_target"`
 	InteractionType string `json:"interaction_type"`
 }

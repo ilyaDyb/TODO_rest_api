@@ -4,6 +4,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/go-playground/validator"
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
 )
@@ -57,4 +58,13 @@ func IsValidEmailFormat(email string) bool {
 		return false
 	}
 	return true
+}
+
+func ValidateStruct(data interface{}) error {
+	validate := validator.New()
+	err := validate.Struct(data)
+	if err != nil {
+		return err
+	}
+	return nil
 }

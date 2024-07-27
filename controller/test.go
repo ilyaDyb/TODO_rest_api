@@ -87,7 +87,7 @@ func UploadFile(c *gin.Context) {
 	})
 }
 
-func TestingValidate(c *gin.Context)  {
+func TestingValidate(c *gin.Context) {
 	// curl -X GET "localhost:8080/testing?name=appleboy&address=xyz&birthday=1992-03-15&createTime=1562400033000000123&unixTime=1562400033"
 	var person PersonValidator
 	if c.ShouldBind(&person) == nil {
@@ -110,14 +110,14 @@ func TestQueries(c *gin.Context) {
 	// var allPhotoForSpecialUser []models.Photo
 	// var user models.User
 	// config.DB.Where("username = ?", "wicki").First(&user)
-	// UserID := user.Id
+	// UserID := user.ID
 	// config.DB.Where("user_id = ?", UserID).Find(&allPhotoForSpecialUser)
 	// c.JSON(http.StatusOK, allPhotoForSpecialUser)
 
 	// All users with their photos
 	var allUsers []models.User
 	config.DB.Preload("Photo").Find(&allUsers)
-	config.DB.Find(&allUsers)
+
 	// for _, usr := range allUsers {
 	// 	usr.Sex = "male"
 	// 	config.DB.Save(&usr)
@@ -131,7 +131,7 @@ func TestQueries(c *gin.Context) {
 	// usr.Sex = "female"
 	// config.DB.Save(&usr)
 	// var interactions []models.UserInteraction
-	// config.DB.Model(models.UserInteraction{}).Where("user_id = ?", usr.Id).Find(&interactions)
+	// config.DB.Model(models.UserInteraction{}).Where("user_id = ?", usr.ID).Find(&interactions)
 	// c.JSON(http.StatusOK, gin.H{"count": len(interactions), "interactions": interactions})
 	// c.JSON(http.StatusOK, usr)
 	return

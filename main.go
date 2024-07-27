@@ -1,12 +1,12 @@
 package main
 
 import (
-	"time"
 
-	"github.com/gin-contrib/cors"
+	// "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/ilyaDyb/go_rest_api/config"
 	_ "github.com/ilyaDyb/go_rest_api/docs"
+	"github.com/ilyaDyb/go_rest_api/middleware"
 	"github.com/ilyaDyb/go_rest_api/routes"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -34,14 +34,8 @@ func main() {
 
 	config.Connect()
 	router := gin.Default()
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// router.Use(cors.Default())
+	router.Use(middleware.CORSMiddleware())
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	routes.TestRoute(router)
 	routes.AuthRoute(router)

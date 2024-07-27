@@ -25,5 +25,7 @@ func UserRoute(router *gin.Engine) {
 		authorized.PUT("/profile", controller.EditProfileController)
 		authorized.PUT("/set-as-preview/:photo_id", controller.SetAsPriview)
 		authorized.POST("/save-location", controller.SaveLocation)
+		authorized.POST("/set-coordinates", controller.SetCoordinates)
+		authorized.GET("/liked-by-users", controller.LikedByUsers)
 	}
 }

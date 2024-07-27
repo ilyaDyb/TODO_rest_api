@@ -1,7 +1,6 @@
 package controller
 
 import (
-	// "log"
 	"fmt"
 	"log"
 	"mime/multipart"
@@ -10,9 +9,10 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ilyaDyb/go_rest_api/api"
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
-	_ "github.com/ilyaDyb/go_rest_api/utils"
+	"github.com/ilyaDyb/go_rest_api/utils"
 )
 
 // @Summary  User profile
@@ -29,28 +29,28 @@ func ProfileController(c *gin.Context) {
 	username := c.Param("username")
 	username = username[1:]
 	if username == "" || username == "/" {
-		usernameFromToken, exists := c.Get("username")
-		if !exists {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden!"})
-			return
-		}
-		username = usernameFromToken.(string)
+		usernameFromToken := c.MustGet("username").(string)
+		username = usernameFromToken
 	}
 	var user models.User
 	if err := config.DB.Preload("Photo").Where("username = ?", username).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{
+		"user":         user,
+		"count_photos": len(user.Photo),
+	})
 }
 
 type ChangeProfileInput struct {
-	Firstname string                `form:"firstname"`
-	Lastname  string                `form:"lastname"`
-	Age       uint8                 `form:"age"`
-	Country   string                `form:"country"`
-	Bio       string                `form:"bio"`
-	Hobbies   string                `form:"hobbies"`
+	Firstname string                `form:"firstname" validate:"max=20"`
+	Lastname  string                `form:"lastname" validate:"max=20"`
+	Age       uint8                 `form:"age" validate:"min=18,max=99"`
+	Country   string                `form:"country" validate:"max=30"`
+	City      string                `form:"city" validate:"max=30"`
+	Bio       string                `form:"bio" validate:"max=500"`
+	Hobbies   string                `form:"hobbies" validate:"max=100"`
 	Photo     *multipart.FileHeader `form:"photo"`
 }
 
@@ -64,6 +64,7 @@ type ChangeProfileInput struct {
 // @Param lastname formData string false "Last Name"
 // @Param age formData uint8 false "Age"
 // @Param country formData string false "Country"
+// @Param city formData string false "City"
 // @Param bio formData string false "Bio"
 // @Param hobbies formData string false "Hobbies"
 // @Param photo formData file false "Profile Photo"
@@ -80,6 +81,12 @@ func EditProfileController(c *gin.Context) {
 
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := utils.ValidateStruct(input)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -104,7 +111,7 @@ func EditProfileController(c *gin.Context) {
 			os.MkdirAll(config.UserPhotoPath, os.ModePerm)
 		}
 
-		filePath := filepath.Join(config.UserPhotoPath, fmt.Sprintf("%d_%s", user.Id, file.Filename))
+		filePath := filepath.Join(config.UserPhotoPath, fmt.Sprintf("%d_%s", user.ID, file.Filename))
 		log.Println(filePath)
 		if err := c.SaveUploadedFile(file, filePath); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save file"})
@@ -140,20 +147,20 @@ func SetAsPriview(c *gin.Context) {
 	photoId := c.Param("photo_id")
 
 	var user models.User
-	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil { 
+	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
 	tx := config.DB.Begin()
-	
-	if err := tx.Model(&models.Photo{}).Where("id = ? AND user_id = ?", photoId, user.Id).Update("is_preview", true).Error; err != nil {
+
+	if err := tx.Model(&models.Photo{}).Where("id = ? AND user_id = ?", photoId, user.ID).Update("is_preview", true).Error; err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
-	if err := tx.Model(&models.Photo{}).Where("user_id = ? AND id != ?", user.Id, photoId).Update("is_preview", false).Error; err != nil {
+	if err := tx.Model(&models.Photo{}).Where("user_id = ? AND id != ?", user.ID, photoId).Update("is_preview", false).Error; err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -188,7 +195,7 @@ func SaveLocation(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	
+
 	tx := config.DB.Begin()
 	if err := config.DB.Model(&user).UpdateColumn("lat", input.Lat).Error; err != nil {
 		tx.Rollback()
@@ -201,4 +208,66 @@ func SaveLocation(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Location saved successfully"})
+}
+
+// @Summary      Save location
+// @Accept       json
+// @Produce      json
+// @Param Authorization header string true "With the Bearer started"
+// @Success      200         {object}  utils.MessageResponse
+// @Failure      500         {object}  utils.ErrorResponse
+// @Router       /u/set-coordinates [post]
+func SetCoordinates(c *gin.Context) {
+	username := c.MustGet("username").(string)
+
+	var user models.User
+
+	config.DB.Where("username = ?", username).First(&user)
+
+	country := user.Country
+	city := user.City
+
+	place := fmt.Sprintf("%s %s", country, city)
+
+	lat, lon, err := api.GetCoordinates(place)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"lat": lat, "lon": lon})
+}
+
+// @Summary      Url for getting users which liked me
+// @Accept       json
+// @Produce      json
+// @Param Authorization header string true "With the Bearer started"
+// @Success      200         {object}  utils.MessageResponse
+// @Failure      500         {object}  utils.ErrorResponse
+// @Router       /u/liked-by-users [get]
+func LikedByUsers(c *gin.Context) {
+	username := c.MustGet("username").(string)
+	var user models.User
+	if err := config.DB.Table("users").Where("username = ?", username).First(&user).Error; err != nil {
+		log.Println("Error fetching user:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	var usersIdsWhichLikedMe []uint
+	if err := config.DB.Model(&models.UserInteraction{}).Where("target_id = ?", user.ID).Pluck("user_id", &usersIdsWhichLikedMe).Error; err != nil {
+		log.Println("Error fetching user interactions:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	var usersWhichLikedMe []models.User
+	if err := config.DB.Preload("Photo").Model(&models.User{}).Where("id IN (?)", usersIdsWhichLikedMe).Find(&usersWhichLikedMe).Error; err != nil {
+		log.Println("Error fetching users who liked:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, usersWhichLikedMe)
 }

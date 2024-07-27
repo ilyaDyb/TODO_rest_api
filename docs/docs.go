@@ -173,6 +173,40 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/u/liked-by-users": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Url for getting users which liked me",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "With the Bearer started",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/u/profile": {
             "get": {
                 "consumes": [
@@ -435,6 +469,40 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/u/set-coordinates": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Save location",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "With the Bearer started",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -494,6 +562,7 @@ const docTemplate = `{
         "controller.RegisterInput": {
             "type": "object",
             "required": [
+                "City",
                 "age",
                 "country",
                 "email",
@@ -504,6 +573,9 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
+                "City": {
+                    "type": "string"
+                },
                 "age": {
                     "type": "integer",
                     "maximum": 99,

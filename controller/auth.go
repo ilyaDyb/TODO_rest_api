@@ -11,19 +11,20 @@ import (
 )
 
 type RegisterInput struct {
-	Username  string `json:"username" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	Password  string `json:"password" binding:"required"`
-	Firstname string `json:"firstname" binding:"required"`
-	Lastname  string `json:"lastname" binding:"required"`
-	Sex       string `json:"sex" binding:"required"`
-	Age       uint8  `json:"age" binding:"required,min=18,max=99"`
-	Country   string `json:"country" binding:"required"`
-	Hobbies   string `json:"hobbies"`
+	Username  string `json:"username" binding:"required" validate:"max=50"`
+	Email     string `json:"email" binding:"required,email" validate:"max=100"`
+	Password  string `json:"password" binding:"required" validate:"min=8,max=100"`
+	Firstname string `json:"firstname" binding:"required" validate:"max=50"`
+	Lastname  string `json:"lastname" binding:"required" validate:"max=50"`
+	Sex       string `json:"sex" binding:"required" validate:"oneof=male female"`
+	Age       uint8  `json:"age" binding:"required" validate:"min=18,max=99"`
+	Country   string `json:"country" binding:"required" validate:"max=50"`
+	City      string `json:"City" binding:"required" validate:"max=50"`
+	Hobbies   string `json:"hobbies" validate:"max=100"`
 }
 
 type LoginInput struct {
-	Username string `json:"username" binding:"required"`
+	Username string `json:"username" binding:"required" validate:"max=50"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -46,6 +47,11 @@ func Register(c *gin.Context) {
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		log.Println("Error when retrieving data")
+		return
+	}
+	err := utils.ValidateStruct(input)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 	if !utils.IsValidUsernameEmail(input.Username, input.Email) {
@@ -95,6 +101,11 @@ func Login(c *gin.Context) {
 	var input LoginInput
 	if err := c.ShouldBindBodyWithJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := utils.ValidateStruct(input)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	var user models.User

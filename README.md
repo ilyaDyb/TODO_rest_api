@@ -12,5 +12,9 @@ Project's stack
 * crypto/bcrypt
 * Swagger/OpenApi
 * PostgreSQL
+* net/http
+* API integration
+* go-pagination
+* go-playground
 
 `Telegram: http://t.me/wicki7`
