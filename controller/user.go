@@ -268,6 +268,5 @@ func LikedByUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
-
 	c.JSON(http.StatusOK, usersWhichLikedMe)
 }
