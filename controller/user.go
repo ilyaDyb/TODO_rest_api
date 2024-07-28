@@ -16,6 +16,7 @@ import (
 )
 
 // @Summary  User profile
+// @Tags user
 // @Accept   json
 // @Produce  json
 // @Param Authorization header string true "With the Bearer started"
@@ -37,6 +38,7 @@ func ProfileController(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+	log.Println(user)
 	c.JSON(http.StatusOK, gin.H{
 		"user":         user,
 		"count_photos": len(user.Photo),
@@ -56,6 +58,7 @@ type ChangeProfileInput struct {
 
 // EditProfileController edits user profile
 // @Summary Edit user profile
+// @Tags user
 // @Description Edit user profile details including uploading a profile photo
 // @Accept multipart/form-data
 // @Produce json
@@ -135,6 +138,7 @@ func EditProfileController(c *gin.Context) {
 
 // SetAsPriview change user preview photo
 // @Summary Set as preview
+// @Tags user
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "With the Bearer started"
@@ -176,6 +180,7 @@ type LocationInput struct {
 }
 
 // @Summary      Save location
+// @Tags user
 // @Accept       json
 // @Produce      json
 // @Param Authorization header string true "With the Bearer started"
@@ -211,6 +216,7 @@ func SaveLocation(c *gin.Context) {
 }
 
 // @Summary      Save location
+// @Tags user
 // @Accept       json
 // @Produce      json
 // @Param Authorization header string true "With the Bearer started"
@@ -240,6 +246,7 @@ func SetCoordinates(c *gin.Context) {
 }
 
 // @Summary      Url for getting users which liked me
+// @Tags user
 // @Accept       json
 // @Produce      json
 // @Param Authorization header string true "With the Bearer started"

@@ -52,6 +52,7 @@ type usersListResponse struct {
 }
 
 // @Summary Get profile
+// @Tags feed
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "With the Bearer started"
@@ -102,6 +103,7 @@ type InputGrade struct {
 }
 
 // @Summary to Grade profiles
+// @Tags feed
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "With the Bearer started"

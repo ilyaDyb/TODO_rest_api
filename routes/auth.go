@@ -10,5 +10,6 @@ func AuthRoute(router *gin.Engine)  {
 	{
 		authGroup.POST("/registration", controller.Register)
 		authGroup.POST("/login", controller.Login)
+		authGroup.POST("/refresh", controller.Refresh)
 	}
 }

@@ -54,8 +54,14 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
-	if !utils.IsValidUsernameEmail(input.Username, input.Email) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username or email already exists"})
+	query := "SELECT EXISTS (SELECT 1 FROM users WHERE username = ? OR email = ?)" 
+	var exists bool
+	if err := config.DB.Raw(query, input.Username, input.Email).Scan(&exists).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	if exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user with such username or email already exists"})
 		return
 	}
 	if !utils.IsValidPassword(input.Password) {
@@ -68,7 +74,7 @@ func Register(c *gin.Context) {
 	}
 	user := models.User{
 		Username: input.Username, Role: "user", Email: input.Email, Sex: input.Sex,
-		Age: input.Age, Country: input.Country, Hobbies: input.Hobbies,
+		Age: input.Age, Country: input.Country, City: input.City, Hobbies: input.Hobbies,
 		Firstname: input.Firstname, Lastname: input.Lastname,
 	}
 	if err := user.HashPassword(input.Password); err != nil {
@@ -123,5 +129,44 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": token})
+
+	refreshToken, err := utils.GenerateRefreshToken(input.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token, "refresh_token": refreshToken})
+}
+
+type InputRefresh struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+// @Summary      Refreshing access Token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        InputRefresh  body      InputRefresh  true  "InputRefresh"
+// @Success      200         {object}  MessageResponse
+// @Router       /auth/refresh [post]
+func Refresh(c *gin.Context) {
+	var input InputRefresh
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	claims, err := utils.ParseRefreshToken(input.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
+		return
+	}
+
+	newToken, err := utils.GenerateJWT(claims.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": newToken})
 }

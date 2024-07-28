@@ -3,14 +3,26 @@ package main
 import (
 
 	// "github.com/gin-contrib/cors"
+	"log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
 	_ "github.com/ilyaDyb/go_rest_api/docs"
 	"github.com/ilyaDyb/go_rest_api/middleware"
 	"github.com/ilyaDyb/go_rest_api/routes"
+	"github.com/ilyaDyb/go_rest_api/utils"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+const redisAddr = "localhost:6379"
+
+var client *asynq.Client
+
+func init() {
+	client = asynq.NewClient(asynq.RedisClientOpt{Addr: redisAddr})
+}
 
 // @title           Swagger REST API
 // @version         1.0
@@ -41,5 +53,26 @@ func main() {
 	routes.AuthRoute(router)
 	routes.UserRoute(router)
 	routes.FeedRoute(router)
-	router.Run(":8080")
+	go func () {
+		if err := router.Run(":8080"); err != nil {
+			log.Fatalf("could not run sever: %v", err)
+		}
+	} ()
+	srv := asynq.NewServer(
+		asynq.RedisClientOpt{Addr: redisAddr},
+		asynq.Config{
+			Concurrency: 10,
+			Queues: map[string]int{
+				"default": 6,
+				"critical": 3,
+				"low": 1,
+			},
+		},
+	)
+	mux := asynq.NewServeMux()
+	mux.HandleFunc("email:deliver", utils.HandleEmailDeliveryTask)
+
+	if err := srv.Run(mux); err != nil {
+		log.Fatalf("could not run Asynq server: %v", err)
+	}
 }

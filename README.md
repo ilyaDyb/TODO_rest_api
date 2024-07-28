@@ -16,5 +16,9 @@ Project's stack
 * API integration
 * go-pagination
 * go-playground
+* Redis
+* Asynq
+
+[Frontend part for visualization of API](https://github.com/ilyaDyb/tinder_frontend)
 
 `Telegram: http://t.me/wicki7`

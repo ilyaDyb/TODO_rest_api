@@ -76,6 +76,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/refresh": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refreshing access Token",
+                "parameters": [
+                    {
+                        "description": "InputRefresh",
+                        "name": "InputRefresh",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.InputRefresh"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/registration": {
             "post": {
                 "description": "Register a new user by providing a username and password.",
@@ -130,6 +163,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "feed"
+                ],
                 "summary": "Get profile",
                 "parameters": [
                     {
@@ -150,6 +186,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "feed"
                 ],
                 "summary": "to Grade profiles",
                 "parameters": [
@@ -180,6 +219,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "user"
                 ],
                 "summary": "Url for getting users which liked me",
                 "parameters": [
@@ -214,6 +256,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "user"
                 ],
                 "summary": "User profile",
                 "parameters": [
@@ -254,6 +299,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "user"
+                ],
                 "summary": "Edit user profile",
                 "parameters": [
                     {
@@ -285,6 +333,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Country",
                         "name": "country",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "City",
+                        "name": "city",
                         "in": "formData"
                     },
                     {
@@ -348,6 +402,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "user"
+                ],
                 "summary": "User profile",
                 "parameters": [
                     {
@@ -394,6 +451,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "user"
+                ],
                 "summary": "Save location",
                 "parameters": [
                     {
@@ -437,6 +497,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "user"
+                ],
                 "summary": "Set as preview",
                 "parameters": [
                     {
@@ -477,6 +540,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "user"
                 ],
                 "summary": "Save location",
                 "parameters": [
@@ -525,6 +591,17 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.InputRefresh": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.LocationInput": {
             "type": "object",
             "properties": {
@@ -547,7 +624,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50
                 }
             }
         },
@@ -574,7 +652,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "City": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50
                 },
                 "age": {
                     "type": "integer",
@@ -582,28 +661,40 @@ const docTemplate = `{
                     "minimum": 18
                 },
                 "country": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50
                 },
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                 },
                 "firstname": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50
                 },
                 "hobbies": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                 },
                 "lastname": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 8
                 },
                 "sex": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female"
+                    ]
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50
                 }
             }
         },

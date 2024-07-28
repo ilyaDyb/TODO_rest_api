@@ -54,3 +54,24 @@ type UserInteraction struct {
 	TargetID        uint   `json:"target_id" gorm:"uniqueIndex:idx_user_target"`
 	InteractionType string `json:"interaction_type"`
 }
+
+type TemporaryUser struct {
+	gorm.Model
+	// Id             uint      `json:"id" gorm:"primary_key"`
+	Username       string    `json:"name" gorm:"unique"`
+	Email          string    `json:"email"`
+	Password       string    `json:"-"`
+	Firstname      string    `json:"firstname"`
+	Lastname       string    `json:"lastname"`
+	Sex            string    `json:"sex"`
+	Age            uint8     `json:"age"`
+	Country        string    `json:"country"`
+	City           string    `json:"city"`
+	Role           string    `json:"role"`
+	Hobbies        string    `json:"hobbies"`
+	RestrictionEnd time.Time `json:"restriction_end"`
+}
+
+func (tempUser *TemporaryUser) ConvertToUser() error {
+	return nil
+}

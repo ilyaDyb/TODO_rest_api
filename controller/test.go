@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
-	"github.com/ilyaDyb/go_rest_api/models"
+	// "github.com/ilyaDyb/go_rest_api/models"
+	"github.com/ilyaDyb/go_rest_api/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -115,15 +117,15 @@ func TestQueries(c *gin.Context) {
 	// c.JSON(http.StatusOK, allPhotoForSpecialUser)
 
 	// All users with their photos
-	var allUsers []models.User
-	config.DB.Preload("Photo").Find(&allUsers)
+	// var allUsers []models.User
+	// config.DB.Preload("Photo").Find(&allUsers)
 
 	// for _, usr := range allUsers {
 	// 	usr.Sex = "male"
 	// 	config.DB.Save(&usr)
 	// }
 	// config.DB.Save(&allUsers)
-	c.JSON(http.StatusOK, allUsers)
+	// c.JSON(http.StatusOK, allUsers)
 
 	//All interaction
 	// var usr models.User
@@ -134,5 +136,20 @@ func TestQueries(c *gin.Context) {
 	// config.DB.Model(models.UserInteraction{}).Where("user_id = ?", usr.ID).Find(&interactions)
 	// c.JSON(http.StatusOK, gin.H{"count": len(interactions), "interactions": interactions})
 	// c.JSON(http.StatusOK, usr)
+
+
+	//test asynq
+	redisAddr := "localhost:6379"
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: redisAddr})
+	task, err := utils.NewEmailDeliveryTask("recieverEmail", "senderEmail")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	info, err := client.Enqueue(task)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
 	return
 }

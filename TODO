@@ -3,7 +3,7 @@
 + Fix bugs in EditProfileController
 + test photo model
 + validate email
-- add smth for avoid this messages
++ add smth for avoid this messages
     2024/07/27 18:56:19 /home/wicki/.local/golang_projects/go_rest_api/utils/validators.go:27 record not found
     [0.792ms] [rows:0] SELECT * FROM "users" WHERE username = 'test108' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
 
@@ -14,7 +14,21 @@
     - Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
     
 + validate users forms
++ add valid refresh token (JWT)
++ add tags for schemas swag
++ set up go-redis to server
+- set up asynq client to server
+    - make good architecture folder with tasks and others
+    + just connect to asynq and check how it work in logs
 
+- extend Registration controller:
+    - Initialize temporary user
+    - send email for confirmation (with code or url)
+    - then convert to User
+
+- add handler for drop password
+    - ...
+    
 1. Registration and authorization of users:
     + Registration: Users can register by providing their basic information such as name, email address, phone number and creating a password.
     + Authorization: Users can log in using registered credentials.

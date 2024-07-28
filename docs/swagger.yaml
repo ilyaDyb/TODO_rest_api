@@ -12,6 +12,13 @@ definitions:
       targetID:
         type: integer
     type: object
+  controller.InputRefresh:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
   controller.LocationInput:
     properties:
       lat:
@@ -24,6 +31,7 @@ definitions:
       password:
         type: string
       username:
+        maxLength: 50
         type: string
     required:
     - password
@@ -37,26 +45,38 @@ definitions:
   controller.RegisterInput:
     properties:
       City:
+        maxLength: 50
         type: string
       age:
         maximum: 99
         minimum: 18
         type: integer
       country:
+        maxLength: 50
         type: string
       email:
+        maxLength: 100
         type: string
       firstname:
+        maxLength: 50
         type: string
       hobbies:
+        maxLength: 100
         type: string
       lastname:
+        maxLength: 50
         type: string
       password:
+        maxLength: 100
+        minLength: 8
         type: string
       sex:
+        enum:
+        - male
+        - female
         type: string
       username:
+        maxLength: 50
         type: string
     required:
     - City
@@ -134,6 +154,27 @@ paths:
       summary: Login a user
       tags:
       - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: InputRefresh
+        in: body
+        name: InputRefresh
+        required: true
+        schema:
+          $ref: '#/definitions/controller.InputRefresh'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MessageResponse'
+      summary: Refreshing access Token
+      tags:
+      - auth
   /auth/registration:
     post:
       consumes:
@@ -178,6 +219,8 @@ paths:
       - application/json
       responses: {}
       summary: Get profile
+      tags:
+      - feed
   /feed/grade:
     post:
       consumes:
@@ -198,6 +241,8 @@ paths:
       - application/json
       responses: {}
       summary: to Grade profiles
+      tags:
+      - feed
   /u/liked-by-users:
     get:
       consumes:
@@ -220,6 +265,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Url for getting users which liked me
+      tags:
+      - user
   /u/profile:
     get:
       consumes:
@@ -246,6 +293,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: User profile
+      tags:
+      - user
     put:
       consumes:
       - multipart/form-data
@@ -271,6 +320,10 @@ paths:
       - description: Country
         in: formData
         name: country
+        type: string
+      - description: City
+        in: formData
+        name: city
         type: string
       - description: Bio
         in: formData
@@ -308,6 +361,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Edit user profile
+      tags:
+      - user
   /u/profile/{username}:
     get:
       consumes:
@@ -338,6 +393,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: User profile
+      tags:
+      - user
   /u/save-location:
     post:
       consumes:
@@ -366,6 +423,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Save location
+      tags:
+      - user
   /u/set-as-preview/{photo_id}:
     put:
       consumes:
@@ -393,6 +452,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Set as preview
+      tags:
+      - user
   /u/set-coordinates:
     post:
       consumes:
@@ -415,6 +476,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Save location
+      tags:
+      - user
 securityDefinitions:
   JWT:
     type: basic
