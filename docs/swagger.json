@@ -148,7 +148,7 @@
                 }
             }
         },
-        "/feed/get-profiles": {
+        "/u/get-profiles": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -157,7 +157,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "feed"
+                    "user"
                 ],
                 "summary": "Get profile",
                 "parameters": [
@@ -172,7 +172,7 @@
                 "responses": {}
             }
         },
-        "/feed/grade": {
+        "/u/grade": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -181,7 +181,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "feed"
+                    "user"
                 ],
                 "summary": "to Grade profiles",
                 "parameters": [
@@ -437,7 +437,7 @@
             }
         },
         "/u/save-location": {
-            "post": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -483,7 +483,7 @@
             }
         },
         "/u/set-as-preview/{photo_id}": {
-            "put": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -527,7 +527,7 @@
             }
         },
         "/u/set-coordinates": {
-            "post": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -633,8 +633,8 @@
         "controller.RegisterInput": {
             "type": "object",
             "required": [
-                "City",
                 "age",
+                "city",
                 "country",
                 "email",
                 "firstname",
@@ -644,14 +644,14 @@
                 "username"
             ],
             "properties": {
-                "City": {
-                    "type": "string",
-                    "maxLength": 50
-                },
                 "age": {
                     "type": "integer",
                     "maximum": 99,
                     "minimum": 18
+                },
+                "city": {
+                    "type": "string",
+                    "maxLength": 50
                 },
                 "country": {
                     "type": "string",

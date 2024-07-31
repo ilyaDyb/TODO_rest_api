@@ -19,7 +19,7 @@ type RegisterInput struct {
 	Sex       string `json:"sex" binding:"required" validate:"oneof=male female"`
 	Age       uint8  `json:"age" binding:"required" validate:"min=18,max=99"`
 	Country   string `json:"country" binding:"required" validate:"max=50"`
-	City      string `json:"City" binding:"required" validate:"max=50"`
+	City      string `json:"city" binding:"required" validate:"max=50"`
 	Hobbies   string `json:"hobbies" validate:"max=100"`
 }
 
@@ -76,7 +76,8 @@ func Register(c *gin.Context) {
 		Username: input.Username, Role: "user", Email: input.Email, Sex: input.Sex,
 		Age: input.Age, Country: input.Country, City: input.City, Hobbies: input.Hobbies,
 		Firstname: input.Firstname, Lastname: input.Lastname,
-	}
+	}	
+	
 	if err := user.HashPassword(input.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Println("Error when hashing password")

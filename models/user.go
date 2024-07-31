@@ -26,6 +26,7 @@ type User struct {
 	Hobbies        string    `json:"hobbies"`
 	Photo          []Photo   `json:"photo" gorm:"foreignKey:UserID"`
 	RestrictionEnd time.Time `json:"restriction_end"`
+	IsActive 	   bool		 `json:"is_active" gotm:"default:false"`
 }
 
 func (u *User) HashPassword(password string) error {

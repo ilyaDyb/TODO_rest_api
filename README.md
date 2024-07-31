@@ -9,15 +9,16 @@ Project's stack
 * Gin
 * Gorm
 * JWT
-* crypto/bcrypt
 * Swagger/OpenApi
 * PostgreSQL
 * net/http
 * API integration
-* go-pagination
-* go-playground
 * Redis
 * Asynq
+* go-pagination
+* go-playground
+* smtp
+* crypto/bcrypt
 
 [Frontend part for visualization of API](https://github.com/ilyaDyb/tinder_frontend)
 

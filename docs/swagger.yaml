@@ -44,13 +44,13 @@ definitions:
     type: object
   controller.RegisterInput:
     properties:
-      City:
-        maxLength: 50
-        type: string
       age:
         maximum: 99
         minimum: 18
         type: integer
+      city:
+        maxLength: 50
+        type: string
       country:
         maxLength: 50
         type: string
@@ -79,8 +79,8 @@ definitions:
         maxLength: 50
         type: string
     required:
-    - City
     - age
+    - city
     - country
     - email
     - firstname
@@ -205,7 +205,7 @@ paths:
       summary: Register a new user
       tags:
       - auth
-  /feed/get-profiles:
+  /u/get-profiles:
     get:
       consumes:
       - application/json
@@ -220,8 +220,8 @@ paths:
       responses: {}
       summary: Get profile
       tags:
-      - feed
-  /feed/grade:
+      - user
+  /u/grade:
     post:
       consumes:
       - application/json
@@ -242,7 +242,7 @@ paths:
       responses: {}
       summary: to Grade profiles
       tags:
-      - feed
+      - user
   /u/liked-by-users:
     get:
       consumes:
@@ -396,7 +396,7 @@ paths:
       tags:
       - user
   /u/save-location:
-    post:
+    patch:
       consumes:
       - application/json
       parameters:
@@ -426,7 +426,7 @@ paths:
       tags:
       - user
   /u/set-as-preview/{photo_id}:
-    put:
+    patch:
       consumes:
       - application/json
       parameters:
@@ -455,7 +455,7 @@ paths:
       tags:
       - user
   /u/set-coordinates:
-    post:
+    patch:
       consumes:
       - application/json
       parameters:

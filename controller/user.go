@@ -7,13 +7,25 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rosberry/go-pagination"
 	"github.com/ilyaDyb/go_rest_api/api"
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
+	"github.com/ilyaDyb/go_rest_api/service"
 	"github.com/ilyaDyb/go_rest_api/utils"
 )
+
+type UserController struct {
+	userService *service.UserService
+}
+
+func NewUserController(userService *service.UserService) *UserController {
+	return &UserController{userService: userService}
+}
 
 // @Summary  User profile
 // @Tags user
@@ -26,21 +38,21 @@ import (
 // @Failure  404 {object} utils.ErrorResponse
 // @Router   /u/profile [get]
 // @Router   /u/profile/{username} [get]
-func ProfileController(c *gin.Context) {
+func (ctrl *UserController) ProfileController(c *gin.Context) {
 	username := c.Param("username")
 	username = username[1:]
 	if username == "" || username == "/" {
 		usernameFromToken := c.MustGet("username").(string)
 		username = usernameFromToken
 	}
-	var user models.User
-	if err := config.DB.Preload("Photo").Where("username = ?", username).First(&user).Error; err != nil {
+	user, err := ctrl.userService.GetUser(username)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 	log.Println(user)
 	c.JSON(http.StatusOK, gin.H{
-		"user":         user,
+		"user": user,
 		"count_photos": len(user.Photo),
 	})
 }
@@ -77,37 +89,32 @@ type ChangeProfileInput struct {
 // @Failure 404 {object} utils.ErrorResponse
 // @Failure 500 {object} utils.ErrorResponse
 // @Router /u/profile [put]
-func EditProfileController(c *gin.Context) {
+func (ctrl *UserController) EditProfileController(c *gin.Context) {
 	currentUsername := c.MustGet("username").(string)
 	var input ChangeProfileInput
-	var user models.User
-
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	
 	err := utils.ValidateStruct(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	if err := config.DB.Table("users").Where("username = ?", currentUsername).First(&user).Error; err != nil {
+	user, err := ctrl.userService.GetUser(currentUsername)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-
-	fmt.Printf("Input: %+v\n", input)
-
-	// Update user's profile fields
+	
 	user.Firstname = input.Firstname
 	user.Lastname = input.Lastname
 	user.Age = input.Age
 	user.Country = input.Country
 	user.Bio = input.Bio
 	user.Hobbies = input.Hobbies
-
 	file, err := c.FormFile("photo")
 	if err == nil {
 		if _, err := os.Stat(config.UserPhotoPath); os.IsNotExist(err) {
@@ -128,13 +135,14 @@ func EditProfileController(c *gin.Context) {
 		user.Photo = append(user.Photo, photo)
 	}
 
-	if err := config.DB.Model(&user).Updates(user).Error; err != nil {
+	if err := ctrl.userService.UpdateUser(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to update user profile"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully"})
 }
+
 
 // SetAsPriview change user preview photo
 // @Summary Set as preview
@@ -145,32 +153,26 @@ func EditProfileController(c *gin.Context) {
 // @Param photo_id path uint true "Id for photo which you want to set as privew"
 // @Success 200 {object} utils.MessageResponse
 // @Failure 500 {object} utils.ErrorResponse
-// @Router /u/set-as-preview/{photo_id} [put]
-func SetAsPriview(c *gin.Context) {
+// @Router /u/set-as-preview/{photo_id} [patch]
+func (ctrl *UserController) SetAsPriviewController(c *gin.Context) {
 	username := c.MustGet("username").(string)
-	photoId := c.Param("photo_id")
-
-	var user models.User
-	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	photoId, err := strconv.Atoi(c.Param("photo_id"))
+	if err != nil {
+		c.Status(400)
 		return
 	}
 
-	tx := config.DB.Begin()
-
-	if err := tx.Model(&models.Photo{}).Where("id = ? AND user_id = ?", photoId, user.ID).Update("is_preview", true).Error; err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	user, err := ctrl.userService.GetUser(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
-	if err := tx.Model(&models.Photo{}).Where("user_id = ? AND id != ?", user.ID, photoId).Update("is_preview", false).Error; err != nil {
-		tx.Rollback()
+	err = ctrl.userService.SetPreviewPhoto(user.ID, uint(photoId))
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	tx.Commit()
-
 	c.JSON(http.StatusOK, gin.H{"message": "Changed preview photo"})
 }
 
@@ -187,31 +189,20 @@ type LocationInput struct {
 // @Param        LocationInput  body      LocationInput  true  "Location with lat, lon "
 // @Success      200         {object}  utils.MessageResponse
 // @Failure      500         {object}  utils.ErrorResponse
-// @Router       /u/save-location [post]
-func SaveLocation(c *gin.Context) {
+// @Router       /u/save-location [patch]
+func (ctrl *UserController) SaveLocationController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	var input LocationInput
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	var user models.User
-	if err := config.DB.Where("username = ?", username).First(&user).Error; err != nil {
+	err := ctrl.userService.SaveLocation(username, input.Lat, input.Lon)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
-	tx := config.DB.Begin()
-	if err := config.DB.Model(&user).UpdateColumn("lat", input.Lat).Error; err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save location"})
-		return
-	}
-	if err := config.DB.Model(&user).UpdateColumn("lon", input.Lon).Error; err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save location"})
-		return
-	}
 	c.JSON(http.StatusOK, gin.H{"message": "Location saved successfully"})
 }
 
@@ -222,23 +213,23 @@ func SaveLocation(c *gin.Context) {
 // @Param Authorization header string true "With the Bearer started"
 // @Success      200         {object}  utils.MessageResponse
 // @Failure      500         {object}  utils.ErrorResponse
-// @Router       /u/set-coordinates [post]
-func SetCoordinates(c *gin.Context) {
+// @Router       /u/set-coordinates [patch]
+func (ctrl *UserController) SetCoordinatesController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 
-	var user models.User
-
-	config.DB.Where("username = ?", username).First(&user)
+	user, err := ctrl.userService.GetUser(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User bot found"})
+		return
+	}
 
 	country := user.Country
 	city := user.City
-
 	place := fmt.Sprintf("%s %s", country, city)
-
 	lat, lon, err := api.GetCoordinates(place)
-
+	
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -253,27 +244,203 @@ func SetCoordinates(c *gin.Context) {
 // @Success      200         {object}  utils.MessageResponse
 // @Failure      500         {object}  utils.ErrorResponse
 // @Router       /u/liked-by-users [get]
-func LikedByUsers(c *gin.Context) {
+func (ctrl *UserController) LikedByUsersController(c *gin.Context) {
 	username := c.MustGet("username").(string)
-	var user models.User
-	if err := config.DB.Table("users").Where("username = ?", username).First(&user).Error; err != nil {
-		log.Println("Error fetching user:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+	user, err := ctrl.userService.GetUser(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-
-	var usersIdsWhichLikedMe []uint
-	if err := config.DB.Model(&models.UserInteraction{}).Where("target_id = ?", user.ID).Pluck("user_id", &usersIdsWhichLikedMe).Error; err != nil {
-		log.Println("Error fetching user interactions:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-		return
-	}
-
-	var usersWhichLikedMe []models.User
-	if err := config.DB.Preload("Photo").Model(&models.User{}).Where("id IN (?)", usersIdsWhichLikedMe).Find(&usersWhichLikedMe).Error; err != nil {
-		log.Println("Error fetching users who liked:", err)
+	usersWhichLikedMe, err := ctrl.userService.GetUsersWhoLikedMe(user.ID)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
 	c.JSON(http.StatusOK, usersWhichLikedMe)
 }
+
+
+// func GetUsersList(userID uint, role string, paginator *pagination.Paginator) []models.User {
+// 	var curUser models.User
+// 	config.DB.First(&curUser, userID)
+
+// 	var users []models.User
+
+// 	var interactedIDs []uint
+// 	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", userID).Pluck("target_id", &interactedIDs)
+
+// 	ageLower := curUser.Age - 3
+// 	ageUpper := curUser.Age + 100
+// 	gender := "male"
+// 	if curUser.Sex == "male" {
+// 		gender = "female"
+// 	} else {
+// 		gender = "male"
+// 	}
+
+// 	q := config.DB.Preload("Photo", "is_preview = ?", true).Model(&models.User{}).
+// 		Where("role = ?", role).
+// 		Where("id != ?", userID).
+// 		Where("age BETWEEN ? and ?", ageLower, ageUpper).
+// 		Where("sex = ?", gender).
+// 		Where("id NOT IN (?)", interactedIDs)
+
+// 	err := paginator.Find(q, &users)
+// 	if err != nil {
+// 		log.Println(err)
+// 		return nil
+// 	}
+// 	return users
+// }
+
+// @Summary Get profile
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "With the Bearer started"
+// @Router /u/get-profiles [get]
+func (ctrl *UserController) GetProfilesController(c *gin.Context) {
+	username := c.MustGet("username").(string)
+	user, err := ctrl.userService.GetUser(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+	userID := user.ID
+	// if user have subscription then set limit = 100 for example
+	paginator, err := pagination.New(pagination.Options{
+		GinContext: c,
+		DB: config.DB,
+		Model: &models.User{},
+		Limit: 2,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return		
+	}
+	users, err := ctrl.userService.GetUsersList(userID, "user", paginator)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusOK, utils.UsersListResponse{
+		Result:     true,
+		Users:      users,
+		Pagination: paginator.PageInfo,
+	})
+}
+// 	users := GetUsersList(userID, "user", paginator)
+
+// 	c.JSON(http.StatusOK, usersListResponse{
+// 		Result:     true,
+// 		Users:      users,
+// 		Pagination: paginator.PageInfo,
+// 	})
+// }
+
+type InputGrade struct {
+	TargetID  uint
+	InterType string
+}
+
+// @Summary to Grade profiles
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "With the Bearer started"
+// @Param InputGrade body InputGrade true "Input for Grade other profile"
+// @Router /u/grade [post]
+func (ctrl *UserController) GradeProfileController(c *gin.Context) {
+	username := c.MustGet("username").(string)
+	user, err := ctrl.userService.GetUser(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+	if user.RestrictionEnd.After(time.Now()) && !(user.RestrictionEnd.IsZero()) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("you have restriction for interaction expire at %02d-%02d", user.RestrictionEnd.Month(), user.RestrictionEnd.Day())})
+		return
+	}
+	var input InputGrade
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	InterType := input.InterType
+	if InterType != "like" && InterType != "dislike" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Interaction should be 'like' or 'dislike'"})
+		return
+	}
+	targetId := input.TargetID
+	var interaction models.UserInteraction
+	interaction.TargetID = targetId
+	interaction.UserID = user.ID
+	interaction.InteractionType = InterType
+	if err := config.DB.Create(&interaction).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	userInteractionsCount, err := ctrl.userService.GetUserInteractionsCount(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	
+	// Check if the user is subscribed if not
+	// if subscriber {limit = 100} else {limit = 10} countOfInteraction%limit == 0 && != 0
+	if userInteractionsCount%10 == 0 && userInteractionsCount != 0 {
+		RestrictionEnd := time.Now().Add(24 * time.Hour)
+		user.RestrictionEnd = RestrictionEnd
+		if err := config.DB.Save(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+	c.Status(http.StatusOK)
+
+}
+
+// func GradeProfile(c *gin.Context) {
+// 	username := c.MustGet("username").(string)
+// 	var curUser models.User
+// 	if err := config.DB.Table("users").Where("username = ?", username).First(&curUser).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+// 		return
+// 	}
+// 	if curUser.RestrictionEnd.After(time.Now()) && !(curUser.RestrictionEnd.IsZero()) {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("you have restriction for interaction expire at %02d-%02d", curUser.RestrictionEnd.Month(), curUser.RestrictionEnd.Day())})
+// 		return
+// 	}
+// 	var input InputGrade
+// 	if err := c.ShouldBind(&input); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+// 		return
+// 	}
+// 	InterType := input.InterType
+// 	if InterType != "like" && InterType != "dislike" {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Interaction should be 'like' or 'dislike'"})
+// 		return
+// 	}
+// 	targetId := input.TargetID
+// 	var interaction models.UserInteraction
+// 	interaction.TargetID = targetId
+// 	interaction.UserID = curUser.ID
+// 	interaction.InteractionType = InterType
+// 	if err := config.DB.Create(&interaction).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+// 		return
+// 	}
+// 	var countOfInteraction int64
+// 	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", curUser.ID).Count(&countOfInteraction)
+// 	// Check if the user is subscribed if not
+// 	// if subscriber {limit = 100} else {limit = 10} countOfInteraction%limit == 0 && != 0
+// 	if countOfInteraction%10 == 0 && countOfInteraction != 0 {
+// 		RestrictionEnd := time.Now().Add(24 * time.Hour)
+// 		curUser.RestrictionEnd = RestrictionEnd
+// 		if err := config.DB.Save(&curUser).Error; err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 			return
+// 		}
+// 	}
+// 	c.Status(http.StatusOK)
+// }

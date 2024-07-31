@@ -155,7 +155,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/feed/get-profiles": {
+        "/u/get-profiles": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -164,7 +164,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "feed"
+                    "user"
                 ],
                 "summary": "Get profile",
                 "parameters": [
@@ -179,7 +179,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/feed/grade": {
+        "/u/grade": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -188,7 +188,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "feed"
+                    "user"
                 ],
                 "summary": "to Grade profiles",
                 "parameters": [
@@ -444,7 +444,7 @@ const docTemplate = `{
             }
         },
         "/u/save-location": {
-            "post": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -490,7 +490,7 @@ const docTemplate = `{
             }
         },
         "/u/set-as-preview/{photo_id}": {
-            "put": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -534,7 +534,7 @@ const docTemplate = `{
             }
         },
         "/u/set-coordinates": {
-            "post": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -640,8 +640,8 @@ const docTemplate = `{
         "controller.RegisterInput": {
             "type": "object",
             "required": [
-                "City",
                 "age",
+                "city",
                 "country",
                 "email",
                 "firstname",
@@ -651,14 +651,14 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
-                "City": {
-                    "type": "string",
-                    "maxLength": 50
-                },
                 "age": {
                     "type": "integer",
                     "maximum": 99,
                     "minimum": 18
+                },
+                "city": {
+                    "type": "string",
+                    "maxLength": 50
                 },
                 "country": {
                     "type": "string",

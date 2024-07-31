@@ -2,8 +2,11 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/controller"
 	"github.com/ilyaDyb/go_rest_api/middleware"
+	"github.com/ilyaDyb/go_rest_api/repository"
+	"github.com/ilyaDyb/go_rest_api/service"
 )
 
 func TestRoute(router *gin.Engine) {
@@ -18,14 +21,20 @@ func TestRoute(router *gin.Engine) {
 	router.GET("/test/queries", controller.TestQueries)
 }
 func UserRoute(router *gin.Engine) {
+	db := config.DB
+	userRepo := repository.NewPostgresUserRepo(db)
+    userService := service.NewUserService(userRepo)
+    userController := controller.NewUserController(userService)
 	authorized := router.Group("/u")
 	authorized.Use(middleware.JWTAuthMiddleware())
 	{
-		authorized.GET("/profile/*username", controller.ProfileController)
-		authorized.PUT("/profile", controller.EditProfileController)
-		authorized.PUT("/set-as-preview/:photo_id", controller.SetAsPriview)
-		authorized.POST("/save-location", controller.SaveLocation)
-		authorized.POST("/set-coordinates", controller.SetCoordinates)
-		authorized.GET("/liked-by-users", controller.LikedByUsers)
+		authorized.GET("/profile/*username", userController.ProfileController)
+		authorized.PUT("/profile", userController.EditProfileController)
+		authorized.PATCH("/set-as-preview/:photo_id", userController.SetAsPriviewController)
+		authorized.PATCH("/save-location", userController.SaveLocationController)
+		authorized.PATCH("/set-coordinates", userController.SetCoordinatesController)
+		authorized.GET("/liked-by-users", userController.LikedByUsersController)
+		authorized.POST("/grade", userController.GradeProfileController)
+		authorized.GET("/get-profiles", userController.GetProfilesController)
 	}
 }

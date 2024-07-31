@@ -1,34 +1,3 @@
-+ need return profile for current user if path have not this param
-+ think about get user from token, not path
-+ Fix bugs in EditProfileController
-+ test photo model
-+ validate email
-+ add smth for avoid this messages
-    2024/07/27 18:56:19 /home/wicki/.local/golang_projects/go_rest_api/utils/validators.go:27 record not found
-    [0.792ms] [rows:0] SELECT * FROM "users" WHERE username = 'test108' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
-
-    2024/07/27 18:56:19 /home/wicki/.local/golang_projects/go_rest_api/utils/validators.go:30 record not found
-    [0.536ms] [rows:0] SELECT * FROM "users" WHERE email = 'ilasdk@mail.ru' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
-
-- Big work for location between different users:
-    - Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
-    
-+ validate users forms
-+ add valid refresh token (JWT)
-+ add tags for schemas swag
-+ set up go-redis to server
-- set up asynq client to server
-    - make good architecture folder with tasks and others
-    + just connect to asynq and check how it work in logs
-
-- extend Registration controller:
-    - Initialize temporary user
-    - send email for confirmation (with code or url)
-    - then convert to User
-
-- add handler for drop password
-    - ...
-    
 1. Registration and authorization of users:
     + Registration: Users can register by providing their basic information such as name, email address, phone number and creating a password.
     + Authorization: Users can log in using registered credentials.
@@ -40,11 +9,10 @@
     + For now just give out profiles
     + Swipe functionality: Ability to swipe profiles (left or right), expressing interest or refusal.
     - Add chat for 2 user which liked each other.
-    - Display user's likes or not, idk.
-    - Display users which liked me (current user) and add logic for response interaction.
+    + Display users which liked me (current user) and add logic for response interaction.
     + Think about limit for unsubscribed users (10 for ex)
     + get profile without pagination
-    +- get profile with pagination
+    + get profile with pagination
 4. User interaction
     - Messages: Built-in messaging system for communication between matched users (matches).
     - Notifications: Push notifications and in-app notifications for new messages, matches and likes.
@@ -53,3 +21,47 @@
     - Subscriptions and Premium Features: Paid features such as unlimited likes, the ability to see who has viewed a profile, and Rewind.
 6. User Interface and Experience (UI/UX)
     - Intuitive Design: Easy to use and attractive interface for improved user experience.
+
+7. Other:
+    + need return profile for current user if path have not this param
+    + think about get user from token, not path
+    + Fix bugs in EditProfileController
+    + test photo model
+    + validate email
+    + add smth for avoid this messages
+        2024/07/27 18:56:19 /home/wicki/.local/golang_projects/go_rest_api/utils/validators.go:27 record not found
+        [0.792ms] [rows:0] SELECT * FROM "users" WHERE username = 'test108' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
+
+        2024/07/27 18:56:19 /home/wicki/.local/golang_projects/go_rest_api/utils/validators.go:30 record not found
+        [0.536ms] [rows:0] SELECT * FROM "users" WHERE email = 'ilasdk@mail.ru' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
+
+    - Big work for location between different users:
+        - Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
+        
+    + validate users forms
+    + add valid refresh token (JWT)
+    + add tags for schemas swag
+    + set up go-redis to server
+    + set up asynq client to server
+        + just connect to asynq and check how it work in logs
+    - make good architecture folder with tasks and others
+
+    - extend Registration controller:
+            - send email for confirmation (with code or url)
+        - then change status is_active to True -> :
+            - make interface for getting users, filtering and other with is_active query.
+
+    + configure redis for caching
+        + add base operations
+
+    - big remake app's architecture
+        - all controllers with repo way:
+            + user controllers
+            - auth controllers
+
+    - add handler for drop password
+        - ...
+        
+    
+
+    - make Dockerfile and docker-compose work

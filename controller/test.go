@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hibiken/asynq"
+	// "github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
+	"github.com/ilyaDyb/go_rest_api/models"
 	// "github.com/ilyaDyb/go_rest_api/models"
-	"github.com/ilyaDyb/go_rest_api/utils"
+	// "github.com/ilyaDyb/go_rest_api/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -137,19 +138,55 @@ func TestQueries(c *gin.Context) {
 	// c.JSON(http.StatusOK, gin.H{"count": len(interactions), "interactions": interactions})
 	// c.JSON(http.StatusOK, usr)
 
+	// Test async
+	// message := utils.GetMD5Hash(utils.RandStringRunes(10))
+	// msg := []byte(fmt.Sprintf("To: recipient@example.net\r\n" +
+	// 	"Subject: Tinder-clone!\r\n" +
+	// 	"\r\n" +
+	// 	"This is the email body %s%s/auth/confirm-email/%s.\r\n", config.ServerProtocol, config.ServerHost, message))
+	// task, err := utils.NewEmailDeliveryTask("ilyachannel1.0@gmail.com", msg)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return
+	// }
+	// info, err := config.Client.Enqueue(task)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
+	// c.JSON(200, info)
 
-	//test asynq
-	redisAddr := "localhost:6379"
-	client := asynq.NewClient(asynq.RedisClientOpt{Addr: redisAddr})
-	task, err := utils.NewEmailDeliveryTask("recieverEmail", "senderEmail")
-	if err != nil {
-		log.Println(err)
-		return
+	// Test redis operations
+
+	// err := utils.SetCache(config.RedisClient, "1", "asdasd",  time.Minute * 10)
+	// if err != nil {
+	// 	c.JSON(500, gin.H{"error": err})
+	// }
+	// val, err := utils.GetCache(config.RedisClient, "1")
+	// if err != nil {
+	// 	c.JSON(500, gin.H{"error": err})
+	// }
+	// c.JSON(200, gin.H{"val": val})
+
+	// erro := utils.DeleteCache(config.RedisClient, "1")
+	// if erro != nil {
+	// 	c.JSON(500, gin.H{"error": erro})
+	// }
+
+	// test grade and interactions
+	type userAndHisInter struct {
+		User         models.User
+		Interactions []models.UserInteraction
 	}
-	info, err := client.Enqueue(task)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
+	var user models.User
+	config.DB.Where("username = ?", "wicki").First(&user)
+	var interactions []models.UserInteraction
+	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", user.ID).Find(&interactions)
+	c.JSON(200, userAndHisInter{User: user, Interactions: interactions})
+	
+	//all interactions
+	// var interactions []models.UserInteraction
+	// config.DB.Model(&models.UserInteraction{}).Find(&interactions)
+	// c.JSON(200, interactions)
 	return
 }

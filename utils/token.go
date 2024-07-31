@@ -22,7 +22,7 @@ type RefreshClaims struct {
 
 
 func GenerateJWT(username string) (string, error) {
-	expirationTime := time.Now().Add(15 * time.Second)
+	expirationTime := time.Now().Add(60 * time.Minute)
 	claims := &Claims{
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
