@@ -32,7 +32,9 @@ func Connect() {
     if err != nil {
         panic("failed to connect database: " + err.Error())
     }
-    DB.AutoMigrate(&models.User{})
-    DB.AutoMigrate(&models.Photo{})
-    DB.AutoMigrate(&models.UserInteraction{})
+    DB.AutoMigrate(
+        &models.User{},
+        &models.Photo{},
+        &models.UserInteraction{},
+    )
 }

@@ -44,24 +44,32 @@
     + set up go-redis to server
     + set up asynq client to server
         + just connect to asynq and check how it work in logs
-    - make good architecture folder with tasks and others
+    + make good architecture folder with tasks and others
 
-    - extend Registration controller:
-            - send email for confirmation (with code or url)
-        - then change status is_active to True -> :
-            - make interface for getting users, filtering and other with is_active query.
+    + extend Registration controller:
+            + send email for confirmation (with code or url)
+        + then change status is_active to True -> :
+            + make interface for getting users, filtering and other with is_active query.
 
     + configure redis for caching
         + add base operations
 
-    - big remake app's architecture
-        - all controllers with repo way:
+    + big remake app's architecture
+        + all controllers with repo way:
             + user controllers
-            - auth controllers
+            + auth controllers
+            + admin controllers
+
+    - do very simple main.go file
 
     - add handler for drop password
         - ...
-        
-    
+
+    - make pereodic task for deleting user which has status is_active = false if different between now and CreatedAT >= 24 hours
+
+    + do normal admin without admin role because its so hardly to write on frontend:
+        P.S: For production, i would do perfect middleware for checking access
+
+    - add file for creating admin user (not required)
 
     - make Dockerfile and docker-compose work

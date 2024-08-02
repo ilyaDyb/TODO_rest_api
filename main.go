@@ -1,8 +1,6 @@
 package main
 
 import (
-
-	// "github.com/gin-contrib/cors"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -45,12 +43,14 @@ func main() {
 
 	config.Connect()
 	router := gin.Default()
+
 	// router.Use(cors.Default())
 	router.Use(middleware.CORSMiddleware())
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	routes.TestRoute(router)
 	routes.AuthRoute(router)
 	routes.UserRoute(router)
+	routes.AdminRoute(router)
 	go func () {
 		if err := router.Run(":8080"); err != nil {
 			log.Fatalf("could not run sever: %v", err)

@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/rosberry/go-pagination"
@@ -17,8 +20,20 @@ func NewPostgresUserRepo(db *gorm.DB) *PostgresUserRepo {
 
 func (repo *PostgresUserRepo) GetUserByUsername(username string) (*models.User, error) {
 	var user models.User
-	// if err := repo.db.Preload("Photo").Where("username = ?, is_active = ?", username, true).Error; err != nil{
-	if err := repo.db.Preload("Photo").Where("username = ?", username).First(&user).Error; err != nil{
+	if err := repo.db.Preload("Photo").Where("username = ? AND is_active = ?", username, true).First(&user).Error; err != nil{
+	// if err := repo.db.Preload("Photo").Where("username = ?", username).First(&user).Error; err != nil{
+		return nil, err
+	}
+	// if user.ID == 0 {
+	// 	return &user, fmt.Errorf("user's status is unactive")
+	// }
+	log.Println(user)
+	return &user, nil
+}
+
+func (repo *PostgresUserRepo) GetUserByID(ID uint) (*models.User, error) {
+	var user models.User
+	if err := config.DB.First(&user, ID).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -30,6 +45,10 @@ func (repo *PostgresUserRepo) CreateUser(user *models.User) error {
 
 func (repo *PostgresUserRepo) UpdateUser(user *models.User) error {
 	return repo.db.Save(user).Error
+}
+
+func (repo *PostgresUserRepo) DeleteUser(user *models.User) error {
+	return repo.db.Delete(user).Error
 }
 
 func (repo *PostgresUserRepo) SetPreviewPhoto(userID uint, photoID uint) error {
@@ -113,4 +132,37 @@ func (repo *PostgresUserRepo) GetUserInteractionsCount(userID uint) (int64, erro
 		return 0, nil
 	}
 	return userInteractionsCount, nil
+}
+
+func (repo *PostgresUserRepo) UserIsExists(username string, email string) (bool, error){
+	query := "SELECT EXISTS (SELECT 1 FROM users WHERE username = ? OR email = ?)"
+	var exists bool
+	if err := config.DB.Raw(query, username, email).Scan(&exists).Error; err != nil {
+		return exists, err
+	}
+	return exists, nil
+}
+
+func (repo *PostgresUserRepo) GetUserByHash(hash string) (*models.User, error) {
+    var user models.User
+    if err := repo.db.Where("confirmation_hash = ?", hash).First(&user).Error; err != nil {
+        return nil, err
+    }
+    return &user, nil
+}
+
+func (repo *PostgresUserRepo) GetUsersCount() (int, error) {
+    var count int64
+    if err := repo.db.Model(&models.User{}).Count(&count).Error; err != nil {
+        return 0, err
+    }
+    return int(count), nil
+}
+
+func (repo *PostgresUserRepo) GetAllUsers(limit int, offset int) ([]models.User, error) {
+    var users []models.User
+    if err := repo.db.Limit(limit).Offset(offset).Order("id DESC").Find(&users).Error; err != nil {
+        return users, fmt.Errorf("err")
+    }
+    return users, nil
 }

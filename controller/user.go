@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rosberry/go-pagination"
 	"github.com/ilyaDyb/go_rest_api/api"
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/service"
 	"github.com/ilyaDyb/go_rest_api/utils"
+	"github.com/rosberry/go-pagination"
 )
 
 type UserController struct {
@@ -45,14 +45,14 @@ func (ctrl *UserController) ProfileController(c *gin.Context) {
 		usernameFromToken := c.MustGet("username").(string)
 		username = usernameFromToken
 	}
-	user, err := ctrl.userService.GetUser(username)
+	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 	log.Println(user)
 	c.JSON(http.StatusOK, gin.H{
-		"user": user,
+		"user":         user,
 		"count_photos": len(user.Photo),
 	})
 }
@@ -96,25 +96,26 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	err := utils.ValidateStruct(input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := ctrl.userService.GetUser(currentUsername)
+	user, err := ctrl.userService.GetUserByUsername(currentUsername)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-	
+
 	user.Firstname = input.Firstname
 	user.Lastname = input.Lastname
 	user.Age = input.Age
 	user.Country = input.Country
+	user.City = input.City
 	user.Bio = input.Bio
-	user.Hobbies = input.Hobbies
+	user.Hobbies = input.Hobbies   
 	file, err := c.FormFile("photo")
 	if err == nil {
 		if _, err := os.Stat(config.UserPhotoPath); os.IsNotExist(err) {
@@ -143,7 +144,6 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully"})
 }
 
-
 // SetAsPriview change user preview photo
 // @Summary Set as preview
 // @Tags user
@@ -162,7 +162,7 @@ func (ctrl *UserController) SetAsPriviewController(c *gin.Context) {
 		return
 	}
 
-	user, err := ctrl.userService.GetUser(username)
+	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -170,7 +170,7 @@ func (ctrl *UserController) SetAsPriviewController(c *gin.Context) {
 
 	err = ctrl.userService.SetPreviewPhoto(user.ID, uint(photoId))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Changed preview photo"})
@@ -194,12 +194,12 @@ func (ctrl *UserController) SaveLocationController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	var input LocationInput
 	if err := c.ShouldBind(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err := ctrl.userService.SaveLocation(username, input.Lat, input.Lon)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -217,7 +217,7 @@ func (ctrl *UserController) SaveLocationController(c *gin.Context) {
 func (ctrl *UserController) SetCoordinatesController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 
-	user, err := ctrl.userService.GetUser(username)
+	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User bot found"})
 		return
@@ -227,9 +227,9 @@ func (ctrl *UserController) SetCoordinatesController(c *gin.Context) {
 	city := user.City
 	place := fmt.Sprintf("%s %s", country, city)
 	lat, lon, err := api.GetCoordinates(place)
-	
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -246,7 +246,7 @@ func (ctrl *UserController) SetCoordinatesController(c *gin.Context) {
 // @Router       /u/liked-by-users [get]
 func (ctrl *UserController) LikedByUsersController(c *gin.Context) {
 	username := c.MustGet("username").(string)
-	user, err := ctrl.userService.GetUser(username)
+	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
@@ -258,7 +258,6 @@ func (ctrl *UserController) LikedByUsersController(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, usersWhichLikedMe)
 }
-
 
 // func GetUsersList(userID uint, role string, paginator *pagination.Paginator) []models.User {
 // 	var curUser models.User
@@ -301,7 +300,7 @@ func (ctrl *UserController) LikedByUsersController(c *gin.Context) {
 // @Router /u/get-profiles [get]
 func (ctrl *UserController) GetProfilesController(c *gin.Context) {
 	username := c.MustGet("username").(string)
-	user, err := ctrl.userService.GetUser(username)
+	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -310,17 +309,17 @@ func (ctrl *UserController) GetProfilesController(c *gin.Context) {
 	// if user have subscription then set limit = 100 for example
 	paginator, err := pagination.New(pagination.Options{
 		GinContext: c,
-		DB: config.DB,
-		Model: &models.User{},
-		Limit: 2,
+		DB:         config.DB,
+		Model:      &models.User{},
+		Limit:      2,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return		
+		return
 	}
 	users, err := ctrl.userService.GetUsersList(userID, "user", paginator)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, utils.UsersListResponse{
@@ -329,6 +328,7 @@ func (ctrl *UserController) GetProfilesController(c *gin.Context) {
 		Pagination: paginator.PageInfo,
 	})
 }
+
 // 	users := GetUsersList(userID, "user", paginator)
 
 // 	c.JSON(http.StatusOK, usersListResponse{
@@ -352,7 +352,7 @@ type InputGrade struct {
 // @Router /u/grade [post]
 func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	username := c.MustGet("username").(string)
-	user, err := ctrl.userService.GetUser(username)
+	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -363,7 +363,7 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	}
 	var input InputGrade
 	if err := c.ShouldBind(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	InterType := input.InterType
@@ -377,15 +377,15 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	interaction.UserID = user.ID
 	interaction.InteractionType = InterType
 	if err := config.DB.Create(&interaction).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	userInteractionsCount, err := ctrl.userService.GetUserInteractionsCount(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	// Check if the user is subscribed if not
 	// if subscriber {limit = 100} else {limit = 10} countOfInteraction%limit == 0 && != 0
 	if userInteractionsCount%10 == 0 && userInteractionsCount != 0 {
@@ -399,48 +399,3 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	c.Status(http.StatusOK)
 
 }
-
-// func GradeProfile(c *gin.Context) {
-// 	username := c.MustGet("username").(string)
-// 	var curUser models.User
-// 	if err := config.DB.Table("users").Where("username = ?", username).First(&curUser).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
-// 		return
-// 	}
-// 	if curUser.RestrictionEnd.After(time.Now()) && !(curUser.RestrictionEnd.IsZero()) {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("you have restriction for interaction expire at %02d-%02d", curUser.RestrictionEnd.Month(), curUser.RestrictionEnd.Day())})
-// 		return
-// 	}
-// 	var input InputGrade
-// 	if err := c.ShouldBind(&input); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
-// 		return
-// 	}
-// 	InterType := input.InterType
-// 	if InterType != "like" && InterType != "dislike" {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Interaction should be 'like' or 'dislike'"})
-// 		return
-// 	}
-// 	targetId := input.TargetID
-// 	var interaction models.UserInteraction
-// 	interaction.TargetID = targetId
-// 	interaction.UserID = curUser.ID
-// 	interaction.InteractionType = InterType
-// 	if err := config.DB.Create(&interaction).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-// 		return
-// 	}
-// 	var countOfInteraction int64
-// 	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", curUser.ID).Count(&countOfInteraction)
-// 	// Check if the user is subscribed if not
-// 	// if subscriber {limit = 100} else {limit = 10} countOfInteraction%limit == 0 && != 0
-// 	if countOfInteraction%10 == 0 && countOfInteraction != 0 {
-// 		RestrictionEnd := time.Now().Add(24 * time.Hour)
-// 		curUser.RestrictionEnd = RestrictionEnd
-// 		if err := config.DB.Save(&curUser).Error; err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			return
-// 		}
-// 	}
-// 	c.Status(http.StatusOK)
-// }

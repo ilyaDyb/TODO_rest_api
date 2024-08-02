@@ -14,8 +14,12 @@ func NewUserService(repo repository.UserRepo) *UserService {
     return &UserService{repo: repo}
 }
 
-func (s *UserService) GetUser(username string) (*models.User, error) {
+func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
     return s.repo.GetUserByUsername(username)
+}
+
+func (s *UserService) GetUserByID(ID uint) (*models.User, error) {
+    return s.repo.GetUserByID(ID)
 }
 
 func (s *UserService) CreateUser(user *models.User) error {
@@ -25,6 +29,11 @@ func (s *UserService) CreateUser(user *models.User) error {
 func (s *UserService) UpdateUser(user *models.User) error {
     return s.repo.UpdateUser(user)
 }
+
+func (s *UserService) DeleteUser(user *models.User) error {
+    return s.repo.DeleteUser(user)
+}
+
 
 func (s *UserService) SetPreviewPhoto(userID uint, photoID uint) error {
     return s.repo.SetPreviewPhoto(userID, photoID)
@@ -48,4 +57,20 @@ func (s *UserService) AddUserInteraction(interaction *models.UserInteraction) er
 
 func (s *UserService) GetUserInteractionsCount(userID uint) (int64, error) {
     return s.repo.GetUserInteractionsCount(userID)    
+}
+
+func (s *UserService) UserIsExists(username string, email string) (bool, error) {
+    return s.repo.UserIsExists(username, email)
+}
+
+func (s *UserService) GetUserByHash(hash string) (*models.User, error) {
+    return s.repo.GetUserByHash(hash)
+}
+
+func (s *UserService) GetAllUsers(limit int, page int) ([]models.User, error) {
+    return s.repo.GetAllUsers(limit, page)
+}
+
+func (s *UserService) GetUsersCount() (int, error) {
+    return s.repo.GetUsersCount()
 }

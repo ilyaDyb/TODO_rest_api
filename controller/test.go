@@ -10,6 +10,7 @@ import (
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
 	// "github.com/ilyaDyb/go_rest_api/models"
+	// "github.com/ilyaDyb/go_rest_api/models"
 	// "github.com/ilyaDyb/go_rest_api/utils"
 
 	"github.com/gin-gonic/gin"
@@ -117,10 +118,13 @@ func TestQueries(c *gin.Context) {
 	// config.DB.Where("user_id = ?", UserID).Find(&allPhotoForSpecialUser)
 	// c.JSON(http.StatusOK, allPhotoForSpecialUser)
 
-	// All users with their photos
-	// var allUsers []models.User
-	// config.DB.Preload("Photo").Find(&allUsers)
+	//Set is_active
+	// config.DB.Model(models.User{}).Where("username = ?", "wicki").Update("is_active", true)
 
+	// All users with their photos
+	var allUsers []models.User
+	config.DB.Preload("Photo").Find(&allUsers)
+	c.JSON(200, allUsers)
 	// for _, usr := range allUsers {
 	// 	usr.Sex = "male"
 	// 	config.DB.Save(&usr)
@@ -174,19 +178,22 @@ func TestQueries(c *gin.Context) {
 	// }
 
 	// test grade and interactions
-	type userAndHisInter struct {
-		User         models.User
-		Interactions []models.UserInteraction
-	}
-	var user models.User
-	config.DB.Where("username = ?", "wicki").First(&user)
-	var interactions []models.UserInteraction
-	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", user.ID).Find(&interactions)
-	c.JSON(200, userAndHisInter{User: user, Interactions: interactions})
+	// type userAndHisInter struct {
+	// 	User         models.User
+	// 	Interactions []models.UserInteraction
+	// }
+	// var user models.User
+	// config.DB.Where("username = ?", "wicki").First(&user)
+	// var interactions []models.UserInteraction
+	// config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", user.ID).Find(&interactions)
+	// c.JSON(200, userAndHisInter{User: user, Interactions: interactions})
 	
 	//all interactions
 	// var interactions []models.UserInteraction
 	// config.DB.Model(&models.UserInteraction{}).Find(&interactions)
 	// c.JSON(200, interactions)
+
+	// query for set is_active = true for all users
+
 	return
 }
