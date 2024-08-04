@@ -74,12 +74,6 @@ A full-featured Tinder-like application built with Go. This project includes use
 
 ## Getting Started
 
-### Prerequisites
-- Go (latest version)
-- PostgreSQL (or SQLite for testing)
-- Redis
-- Docker (for containerization)
-
 ### Installation
 1. Clone the repository:
     ```sh
@@ -92,26 +86,6 @@ A full-featured Tinder-like application built with Go. This project includes use
 3. Install dependencies:
     ```sh
     go mod download
-    ```
-
-### Running the Application
-1. Set up the database and Redis:
-    ```sh
-    docker-compose up -d
-    ```
-2. Run the application:
-    ```sh
-    go run main.go
-    ```
-
-### Running Tests
-1. Set up the test database:
-    ```sh
-    export TEST_DB=sqlite3://test.db
-    ```
-2. Run the tests:
-    ```sh
-    go test ./...
     ```
 
 ## Contributing
