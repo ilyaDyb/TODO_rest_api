@@ -1,5 +1,17 @@
 basePath: /
 definitions:
+  controller.ChangePasswordInput:
+    properties:
+      code:
+        type: string
+      password:
+        type: string
+    type: object
+  controller.EmailInput:
+    properties:
+      email:
+        type: string
+    type: object
   controller.ErrorResponse:
     properties:
       error:
@@ -120,6 +132,70 @@ info:
   title: Swagger REST API
   version: "1.0"
 paths:
+  /auth/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change user password using verification code
+      parameters:
+      - description: Change Password Input
+        in: body
+        name: changePasswordInput
+        required: true
+        schema:
+          $ref: '#/definitions/controller.ChangePasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Change Password
+      tags:
+      - auth
+  /auth/drop-password:
+    post:
+      consumes:
+      - application/json
+      description: Request password reset via email
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/controller.EmailInput'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/controller.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Request Password Reset
+      tags:
+      - auth
   /auth/login:
     post:
       consumes:

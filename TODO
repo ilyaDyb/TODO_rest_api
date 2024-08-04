@@ -17,7 +17,7 @@
     - Messages: Built-in messaging system for communication between matched users (matches).
     - Notifications: Push notifications and in-app notifications for new messages, matches and likes.
 5. Additional features
-    - Geolocation: Using location to match nearby matches.
+    + Geolocation: Using location to match nearby matches.
     - Subscriptions and Premium Features: Paid features such as unlimited likes, the ability to see who has viewed a profile, and Rewind.
 6. User Interface and Experience (UI/UX)
     - Intuitive Design: Easy to use and attractive interface for improved user experience.
@@ -36,8 +36,9 @@
         [0.536ms] [rows:0] SELECT * FROM "users" WHERE email = 'ilasdk@mail.ru' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
 
     - Big work for location between different users:
-        - Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
-        
+        + Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
+        - I think the search algorithm is still a bit raw, so it needs to be tested and improved if necessary.
+
     + validate users forms
     + add valid refresh token (JWT)
     + add tags for schemas swag
@@ -60,16 +61,17 @@
             + auth controllers
             + admin controllers
 
-    - do very simple main.go file
+    +- do very simple main.go file
 
-    - add handler for drop password
+    + add handler for drop password
         - ...
 
-    - make pereodic task for deleting user which has status is_active = false if different between now and CreatedAT >= 24 hours
+    + make pereodic task for deleting user which has status is_active = false if different between now and CreatedAT >= 24 hours
 
     + do normal admin without admin role because its so hardly to write on frontend:
         P.S: For production, i would do perfect middleware for checking access
 
     - add file for creating admin user (not required)
-
+    - write tests with testDB sqlite mb
+    - add any service for analysis logs (mb prometeus)
     - make Dockerfile and docker-compose work

@@ -10,8 +10,8 @@ type UserService struct {
     repo repository.UserRepo
 }
  
-func NewUserService(repo repository.UserRepo) *UserService {
-    return &UserService{repo: repo}
+func NewUserService(repo repository.UserRepo) UserService {
+    return UserService{repo: repo}
 }
 
 func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
@@ -73,4 +73,12 @@ func (s *UserService) GetAllUsers(limit int, page int) ([]models.User, error) {
 
 func (s *UserService) GetUsersCount() (int, error) {
     return s.repo.GetUsersCount()
+}
+
+func (s *UserService) IsExistsEmail(email string) (bool, error) {
+    return s.repo.IsExistsEmail(email)
+}
+
+func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
+    return s.repo.GetUserByEmail(email)
 }

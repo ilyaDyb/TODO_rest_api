@@ -15,6 +15,9 @@ Project's stack
 * API integration
 * Redis
 * Asynq
+* Testing
+* Sqlite3
+* testify
 * go-pagination
 * go-playground
 * smtp

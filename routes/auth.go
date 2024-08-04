@@ -19,5 +19,7 @@ func AuthRoute(router *gin.Engine) {
 		authGroup.POST("/login", authController.LoginController)
 		authGroup.GET("/confirm", authController.ConfirmEmailController)
 		authGroup.POST("/refresh", authController.RefreshController)
+		authGroup.POST("/drop-password", authController.DropPasswordController)
+		authGroup.POST("/change-password", authController.ChangePassword)
 	}
 }

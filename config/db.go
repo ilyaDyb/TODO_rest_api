@@ -8,6 +8,7 @@ import (
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -37,4 +38,15 @@ func Connect() {
         &models.Photo{},
         &models.UserInteraction{},
     )
+}
+
+func ConnectTestDB()  {
+    var err error
+    dsn := "file:test.db?mode=memory&cache=shared"
+    DB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+    if err != nil {
+        log.Fatalf("could not connect to the test database: %v", err.Error())
+    }
+    log.Println("Test database connected successfully")
+    DB.AutoMigrate(&models.User{})
 }

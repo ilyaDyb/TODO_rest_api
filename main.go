@@ -8,6 +8,7 @@ import (
 	"github.com/ilyaDyb/go_rest_api/config"
 	_ "github.com/ilyaDyb/go_rest_api/docs"
 	"github.com/ilyaDyb/go_rest_api/middleware"
+	"github.com/ilyaDyb/go_rest_api/pereodictasks"
 	"github.com/ilyaDyb/go_rest_api/routes"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -56,6 +57,9 @@ func main() {
 			log.Fatalf("could not run sever: %v", err)
 		}
 	} ()
+	if err := pereodictasks.StartPereodicTasks(); err != nil {
+		log.Fatalln(err)
+	}
 	if err := config.StartRedis(); err != nil {
 		log.Fatalln(err)
 	}

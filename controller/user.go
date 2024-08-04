@@ -20,10 +20,10 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	userService service.UserService
 }
 
-func NewUserController(userService *service.UserService) *UserController {
+func NewUserController(userService service.UserService) *UserController {
 	return &UserController{userService: userService}
 }
 
@@ -50,23 +50,13 @@ func (ctrl *UserController) ProfileController(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println(user)
+
 	c.JSON(http.StatusOK, gin.H{
 		"user":         user,
 		"count_photos": len(user.Photo),
 	})
 }
 
-type ChangeProfileInput struct {
-	Firstname string                `form:"firstname" validate:"max=20"`
-	Lastname  string                `form:"lastname" validate:"max=20"`
-	Age       uint8                 `form:"age" validate:"min=18,max=99"`
-	Country   string                `form:"country" validate:"max=30"`
-	City      string                `form:"city" validate:"max=30"`
-	Bio       string                `form:"bio" validate:"max=500"`
-	Hobbies   string                `form:"hobbies" validate:"max=100"`
-	Photo     *multipart.FileHeader `form:"photo"`
-}
 
 // EditProfileController edits user profile
 // @Summary Edit user profile
@@ -90,8 +80,18 @@ type ChangeProfileInput struct {
 // @Failure 500 {object} utils.ErrorResponse
 // @Router /u/profile [put]
 func (ctrl *UserController) EditProfileController(c *gin.Context) {
+	type changeProfileInput struct {
+		Firstname string                `form:"firstname" validate:"max=20"`
+		Lastname  string                `form:"lastname" validate:"max=20"`
+		Age       uint8                 `form:"age" validate:"min=18,max=99"`
+		Country   string                `form:"country" validate:"max=30"`
+		City      string                `form:"city" validate:"max=30"`
+		Bio       string                `form:"bio" validate:"max=500"`
+		Hobbies   string                `form:"hobbies" validate:"max=100"`
+		Photo     *multipart.FileHeader `form:"photo"`
+	}
 	currentUsername := c.MustGet("username").(string)
-	var input ChangeProfileInput
+	var input changeProfileInput
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -108,14 +108,27 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-
-	user.Firstname = input.Firstname
-	user.Lastname = input.Lastname
-	user.Age = input.Age
-	user.Country = input.Country
-	user.City = input.City
-	user.Bio = input.Bio
-	user.Hobbies = input.Hobbies   
+	if input.Firstname != "" {
+		user.Firstname = input.Firstname
+	}
+	if input.Lastname != "" {
+		user.Lastname = input.Lastname
+	}
+	if input.Age != 0 {
+		user.Age = input.Age
+	}
+	if input.Country != "" {
+		user.Country = input.Country
+	}
+	if input.City != "" {
+		user.City = input.City
+	}
+	if input.Bio != "" {
+		user.Bio = input.Bio
+	}
+	if input.Hobbies != "" {
+		user.Hobbies = input.Hobbies
+	}  
 	file, err := c.FormFile("photo")
 	if err == nil {
 		if _, err := os.Stat(config.UserPhotoPath); os.IsNotExist(err) {
@@ -305,13 +318,17 @@ func (ctrl *UserController) GetProfilesController(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
+	if user.RestrictionEnd.After(time.Now()) && !(user.RestrictionEnd.IsZero()) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("you have restriction for interaction expire at %02d-%02d", user.RestrictionEnd.Month(), user.RestrictionEnd.Day())})
+		return
+	}
 	userID := user.ID
 	// if user have subscription then set limit = 100 for example
 	paginator, err := pagination.New(pagination.Options{
 		GinContext: c,
 		DB:         config.DB,
 		Model:      &models.User{},
-		Limit:      2,
+		Limit:      10,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

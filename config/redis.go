@@ -1,11 +1,13 @@
 package config
+
 import (
 	"log"
 
+
 	"github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/tasks"
-
 	"github.com/redis/go-redis/v9"
+
 )
 
 var (
@@ -40,3 +42,4 @@ func StartRedis() error {
 	}
 	return nil
 }
+

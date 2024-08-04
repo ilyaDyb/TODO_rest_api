@@ -3,9 +3,11 @@ package repository
 import (
 	"fmt"
 	"log"
+	"sort"
 
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
+	"github.com/ilyaDyb/go_rest_api/utils"
 	"github.com/rosberry/go-pagination"
 	"gorm.io/gorm"
 )
@@ -27,7 +29,6 @@ func (repo *PostgresUserRepo) GetUserByUsername(username string) (*models.User, 
 	// if user.ID == 0 {
 	// 	return &user, fmt.Errorf("user's status is unactive")
 	// }
-	log.Println(user)
 	return &user, nil
 }
 
@@ -99,8 +100,6 @@ func (repo *PostgresUserRepo) GetUsersList(userID uint, role string, paginator *
 	var interactedIDs []uint
 	config.DB.Model(&models.UserInteraction{}).Where("user_id = ?", userID).Pluck("target_id", &interactedIDs)
 
-	ageLower := curUser.Age - 3
-	ageUpper := curUser.Age + 100
 	gender := "male"
 	if curUser.Sex == "male" {
 		gender = "female"
@@ -111,14 +110,20 @@ func (repo *PostgresUserRepo) GetUsersList(userID uint, role string, paginator *
 	q := config.DB.Preload("Photo", "is_preview = ?", true).Model(&models.User{}).
 		Where("role = ?", role).
 		Where("id != ?", userID).
-		Where("age BETWEEN ? and ?", ageLower, ageUpper).
 		Where("sex = ?", gender).
-		Where("id NOT IN (?)", interactedIDs)
+		Where("id NOT IN (?)", interactedIDs).Limit(10)
 
 	err := paginator.Find(q, &users)
 	if err != nil {
 		return nil, err
 	}
+	scores := make(map[uint]float64)
+	for _, u := range users {
+		scores[u.ID] = utils.CalculateScore(curUser, u)
+	}
+	sort.Slice(users, func(i, j int) bool {
+		return scores[users[i].ID] > scores[users[j].ID]
+	})
 	return users, nil
 }
 
@@ -165,4 +170,27 @@ func (repo *PostgresUserRepo) GetAllUsers(limit int, offset int) ([]models.User,
         return users, fmt.Errorf("err")
     }
     return users, nil
+}
+
+func (repo *PostgresUserRepo) IsExistsEmail(email string) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS (SELECT 1 FROM users WHERE email = ?)"
+	log.Printf("Executing query: %s with email: %s\n", query, email)
+	if err := config.DB.Raw(query, email).Scan(&exists).Error; err != nil {
+		log.Printf("Error executing query: %v\n", err)
+		return exists, err
+	}
+	log.Printf("Email exists: %v\n", exists)
+	return exists, nil
+}
+
+func (repo *PostgresUserRepo) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	log.Printf("Finding user by email: %s\n", email)
+	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		log.Printf("Error finding user by email: %v\n", err)
+		return nil, err
+	}
+	log.Printf("Found user: %v\n", user)
+	return &user, nil
 }

@@ -9,6 +9,7 @@ import (
 	// "github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
+
 	// "github.com/ilyaDyb/go_rest_api/models"
 	// "github.com/ilyaDyb/go_rest_api/models"
 	// "github.com/ilyaDyb/go_rest_api/utils"
@@ -194,6 +195,43 @@ func TestQueries(c *gin.Context) {
 	// c.JSON(200, interactions)
 
 	// query for set is_active = true for all users
-
+	// firstName := "Pavel" 
+	// lastName := "Petrovich"
+	// sex := "male"
+	// age := uint8(19)
+	// country := "Russia"
+	// city := "Saransk"
+	// lat := float32(52.821765)
+	// lon := float32(66.951582)
+	// role := "user"
+	// hobbies := "soccer, tennis"
+	// bio := "string"
+	// isActive := true
+	// // creating a lot of test users with status is_active = true for checking searhc alg
+	// for i := 122; i < 200; i++ {
+	// 	strI := strconv.Itoa(i)
+	// 	username := "test" + strI
+	// 	password := "qwertyuiop2014"
+	// 	email := fmt.Sprintf("test%d@gmail.com", i)
+	// 	user := models.User{
+	// 		Username: username,
+	// 		Email: email,
+	// 		Password: password,
+	// 		Firstname: firstName,
+	// 		Lastname: lastName,
+	// 		Sex: sex,
+	// 		Age: age,
+	// 		Country: country,
+	// 		City: city,
+	// 		Lat: lat,
+	// 		Lon: lon,
+	// 		Role: role,
+	// 		Bio: bio,
+	// 		Hobbies: hobbies,
+	// 		IsActive: isActive,
+	// 	}
+	// 	user.HashPassword(user.Password)
+	// 	config.DB.Create(&user)
+	// }
 	return
 }

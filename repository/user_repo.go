@@ -21,4 +21,6 @@ type UserRepo interface {
     GetUserByHash(hash string) (*models.User, error)
     GetAllUsers(limit int, page int) ([]models.User, error)
     GetUsersCount() (int, error)
+    IsExistsEmail(email string) (bool, error)
+    GetUserByEmail(email string) (*models.User, error)
 }

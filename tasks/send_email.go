@@ -37,6 +37,7 @@ func HandleEmailDeliveryTask(ctx context.Context, t *asynq.Task) error {
     receiver := []string{
         p.RecieverEmail,
     }
+    log.Printf("send email to: %v", receiver)
     smtpHost := "smtp.gmail.com"
     smtpPort := "587"
     message := p.Message

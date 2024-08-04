@@ -12,10 +12,10 @@ import (
 )
 
 type AdminController struct {
-	userService *service.UserService
+	userService service.UserService
 }
 
-func NewAdminController(userService *service.UserService) *AdminController {
+func NewAdminController(userService service.UserService) *AdminController {
     return &AdminController{userService: userService}
 }
 
@@ -80,30 +80,58 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
         c.Status(http.StatusNoContent)
     case "PUT":
         type ChangeProfileInput struct {
-            Firstname string                `form:"firstname" validate:"max=20"`
-            Lastname  string                `form:"lastname" validate:"max=20"`
-            Age       uint8                 `form:"age" validate:"min=18,max=99"`
-            Country   string                `form:"country" validate:"max=30"`
-            City      string                `form:"city" validate:"max=30"`
-            Bio       string                `form:"bio" validate:"max=500"`
-            Hobbies   string                `form:"hobbies" validate:"max=100"`
+            Email     string     `form:"email"`
+            Firstname string     `form:"firstname"`
+            Lastname  string     `form:"lastname"`
+            Age       string     `form:"age"`
+            Country   string     `form:"country"`
+            City      string     `form:"city"`
+            Bio       string     `form:"bio"`
+            Hobbies   string     `form:"hobbies"`
         }
         var input ChangeProfileInput
-        user.Firstname = input.Firstname
-        user.Lastname = input.Lastname
-        user.Age = input.Age
-        user.Country = input.Country
-        user.City = input.City
-        user.Bio = input.Bio
-        user.Hobbies = input.Hobbies
-
+        err := c.ShouldBindBodyWithJSON(&input)
+        if err != nil {
+            log.Println(err.Error())
+            return
+        }
+        log.Println(input)
+        if input.Firstname != "" {
+            user.Firstname = input.Firstname
+        }
+        if input.Email != "" {
+            user.Email = input.Email
+        }
+        if input.Lastname != "" {
+            user.Lastname = input.Lastname
+        }
+        if input.Age != "0" {
+            age, err := strconv.Atoi(input.Age)
+            if err != nil {
+                c.Status(http.StatusBadRequest)
+                return
+            }
+            user.Age = uint8(age)
+        }
+        if input.Country != "" {
+            user.Country = input.Country
+        }
+        if input.City != "" {
+            user.City = input.City
+        }
+        if input.Bio != "" {
+            user.Bio = input.Bio
+        }
+        if input.Hobbies != "" {
+            user.Hobbies = input.Hobbies
+        }
+        log.Println(user)
         if err := ctrl.userService.UpdateUser(user); err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to update user profile"})
             return
         }
         c.Status(http.StatusNoContent)
     case "POST":
-        // TODO
         type createUserInput struct {
             Username  string `json:"username" validate:"max=50"`
             Email     string `json:"email" validate:"max=100"`
