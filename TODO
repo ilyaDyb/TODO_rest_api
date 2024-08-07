@@ -73,5 +73,6 @@
 
     - add file for creating admin user (not required)
     - write tests with testDB sqlite mb
-    - add any service for analysis logs (mb prometeus)
+    + add any service for storage and analysis logs (mb ELK - Logrus -> Elasticsearch -> Kibana)
     - make Dockerfile and docker-compose work
+        + set up docker-compose for log services

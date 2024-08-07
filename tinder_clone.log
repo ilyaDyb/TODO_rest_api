@@ -1,0 +1,11 @@
+{"level":"info","msg":"Application started","time":"2024-08-04T17:52:19+03:00"}
+{"level":"info","msg":"Application started","time":"2024-08-04T17:52:21+03:00"}
+{"level":"info","msg":"Application started","time":"2024-08-04T17:53:20+03:00"}
+{"level":"info","msg":"Application started","time":"2024-08-04T18:11:48+03:00"}
+{"level":"info","msg":"Application started","time":"2024-08-06T13:13:28+03:00"}
+{"level":"info","msg":"Application started","time":"2024-08-06T13:17:45+03:00"}
+{"level":"info","msg":"Application started","time":"2024-08-06T13:19:50+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-06T13:56:50+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-06T17:12:16+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-06T17:12:22+03:00"}
+{"component":"auth","level":"error","msg":"databse service could not find user by username: sadsad, with err: record not found","service":"gorm","time":"2024-08-06T17:18:02+03:00"}

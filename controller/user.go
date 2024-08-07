@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -13,10 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ilyaDyb/go_rest_api/api"
 	"github.com/ilyaDyb/go_rest_api/config"
+	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/service"
 	"github.com/ilyaDyb/go_rest_api/utils"
 	"github.com/rosberry/go-pagination"
+	"github.com/sirupsen/logrus"
 )
 
 type UserController struct {
@@ -47,7 +48,11 @@ func (ctrl *UserController) ProfileController(c *gin.Context) {
 	}
 	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find user by username: %v, with err: %v", username, err.Error())
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
@@ -56,7 +61,6 @@ func (ctrl *UserController) ProfileController(c *gin.Context) {
 		"count_photos": len(user.Photo),
 	})
 }
-
 
 // EditProfileController edits user profile
 // @Summary Edit user profile
@@ -105,6 +109,10 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 
 	user, err := ctrl.userService.GetUserByUsername(currentUsername)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find user by username: %v, with err: %v", currentUsername, err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -128,7 +136,7 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 	}
 	if input.Hobbies != "" {
 		user.Hobbies = input.Hobbies
-	}  
+	}
 	file, err := c.FormFile("photo")
 	if err == nil {
 		if _, err := os.Stat(config.UserPhotoPath); os.IsNotExist(err) {
@@ -136,8 +144,16 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 		}
 
 		filePath := filepath.Join(config.UserPhotoPath, fmt.Sprintf("%d_%s", user.ID, file.Filename))
-		log.Println(filePath)
+
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"username":  currentUsername,
+		}).Infof("user load photo with path: %v", filePath)
 		if err := c.SaveUploadedFile(file, filePath); err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"component": "user",
+				"username":  currentUsername,
+			}).Errorf("user could not load file with err: %v", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save file"})
 			return
 		}
@@ -150,6 +166,11 @@ func (ctrl *UserController) EditProfileController(c *gin.Context) {
 	}
 
 	if err := ctrl.userService.UpdateUser(user); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+			"username":  currentUsername,
+		}).Errorf("user could not update profile with err: %v", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to update user profile"})
 		return
 	}
@@ -171,18 +192,27 @@ func (ctrl *UserController) SetAsPriviewController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	photoId, err := strconv.Atoi(c.Param("photo_id"))
 	if err != nil {
-		c.Status(400)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid value for photo_id"})
 		return
 	}
 
 	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find user by username: %v, with err: %v", username, err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
 	err = ctrl.userService.SetPreviewPhoto(user.ID, uint(photoId))
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+			"username":  username,
+		}).Errorf("user could not set photo as preview with err: %v", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -207,11 +237,20 @@ func (ctrl *UserController) SaveLocationController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	var input LocationInput
 	if err := c.ShouldBind(&input); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"username":  username,
+		}).Errorf("bad request from client with err: %v", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err := ctrl.userService.SaveLocation(username, input.Lat, input.Lon)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+			"username":  username,
+		}).Errorf("user could not save location with err: %v", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -232,7 +271,11 @@ func (ctrl *UserController) SetCoordinatesController(c *gin.Context) {
 
 	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User bot found"})
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("database service could not find user by username: %v, with err: %v", username, err.Error())
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
@@ -242,6 +285,10 @@ func (ctrl *UserController) SetCoordinatesController(c *gin.Context) {
 	lat, lon, err := api.GetCoordinates(place)
 
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "api_location",
+			"username":  username,
+		}).Errorf("api was broke with err: %v", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -261,11 +308,19 @@ func (ctrl *UserController) LikedByUsersController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find user by username: %v, with err: %v", username, err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 	usersWhichLikedMe, err := ctrl.userService.GetUsersWhoLikedMe(user.ID)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find users which liked user with username: %v, with err: %v", username, err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
@@ -315,10 +370,17 @@ func (ctrl *UserController) GetProfilesController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find user by username: %v, with err: %v", username, err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	if user.RestrictionEnd.After(time.Now()) && !(user.RestrictionEnd.IsZero()) {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+		}).Infof("user with username: %v, have restriction for liking other users which expire at %02d-%02d-%04d", username, user.RestrictionEnd.Month(), user.RestrictionEnd.Day(), user.RestrictionEnd.Month())
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("you have restriction for interaction expire at %02d-%02d", user.RestrictionEnd.Month(), user.RestrictionEnd.Day())})
 		return
 	}
@@ -331,11 +393,18 @@ func (ctrl *UserController) GetProfilesController(c *gin.Context) {
 		Limit:      10,
 	})
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+		}).Errorf("server could not send response to user: %v, due to error pagination: %v", username, err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	users, err := ctrl.userService.GetUsersList(userID, "user", paginator)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("server could not filtering by searching alg for user: %v, due to error GetUsersList: %v", username, err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -371,20 +440,33 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	username := c.MustGet("username").(string)
 	user, err := ctrl.userService.GetUserByUsername(username)
 	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("databse service could not find user by username: %v, with err: %v", username, err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 	if user.RestrictionEnd.After(time.Now()) && !(user.RestrictionEnd.IsZero()) {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+		}).Infof("user with username: %v, have restriction for liking other users which expire at %02d-%02d-%04d", username, user.RestrictionEnd.Month(), user.RestrictionEnd.Day(), user.RestrictionEnd.Month())
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("you have restriction for interaction expire at %02d-%02d", user.RestrictionEnd.Month(), user.RestrictionEnd.Day())})
 		return
 	}
 	var input InputGrade
 	if err := c.ShouldBind(&input); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+		}).Errorf("client send invalid data with error: %v", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	InterType := input.InterType
 	if InterType != "like" && InterType != "dislike" {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+		}).Debug("client send invalid data with error: Interaction should be 'like' or 'dislike'")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Interaction should be 'like' or 'dislike'"})
 		return
 	}
@@ -394,12 +476,22 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	interaction.UserID = user.ID
 	interaction.InteractionType = InterType
 	if err := config.DB.Create(&interaction).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+			"target_id": targetId,
+			"user_id":   user.ID,
+		}).Errorf("server could not create interaction with error: %v", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server could not create interaction"})
 		return
 	}
 	userInteractionsCount, err := ctrl.userService.GetUserInteractionsCount(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		logger.Log.WithFields(logrus.Fields{
+			"component": "user",
+			"service":   "gorm",
+		}).Errorf("server could not get count of interactions with error: %v", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server could not get count of interactions"})
 		return
 	}
 
@@ -409,6 +501,9 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 		RestrictionEnd := time.Now().Add(24 * time.Hour)
 		user.RestrictionEnd = RestrictionEnd
 		if err := config.DB.Save(&user).Error; err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"component": "user",
+			}).Errorf("server could not set restriction_end field for user: %v with error: %v", username, err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

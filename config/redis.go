@@ -3,11 +3,11 @@ package config
 import (
 	"log"
 
-
 	"github.com/hibiken/asynq"
+	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/tasks"
 	"github.com/redis/go-redis/v9"
-
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -37,6 +37,9 @@ func StartRedis() error {
 	mux.HandleFunc("email:deliver", tasks.HandleEmailDeliveryTask)
 
 	if err := srv.Run(mux); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"service": "async",
+		}).Fatalf("async start failed with error: %v", err.Error())
 		log.Fatalf("could not run Asynq server: %v", err)
 		return err
 	}

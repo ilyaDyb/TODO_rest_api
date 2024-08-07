@@ -5,8 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -31,8 +33,14 @@ func Connect() {
     var err error
     DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
     if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+			"service": "postgres",
+		}).Fatalf("could not run postgreSQL sever: %v", err)
         panic("failed to connect database: " + err.Error())
     }
+    logger.Log.WithFields(logrus.Fields{
+        "service": "postgres",
+    }).Info("Postgres was started successfully")
     DB.AutoMigrate(
         &models.User{},
         &models.Photo{},

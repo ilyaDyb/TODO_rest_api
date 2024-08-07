@@ -3,13 +3,16 @@ package main
 import (
 	"log"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
 	_ "github.com/ilyaDyb/go_rest_api/docs"
+	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/middleware"
 	"github.com/ilyaDyb/go_rest_api/pereodictasks"
 	"github.com/ilyaDyb/go_rest_api/routes"
+	"github.com/sirupsen/logrus"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -41,10 +44,21 @@ func init() {
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
-
+	esConfig := elasticsearch.Config{
+		Addresses: []string{"http://localhost:9200"},
+	}
+	client, err := elasticsearch.NewClient(esConfig)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"service": "elasticsearch",
+		}).Fatalf("could not run elasticsearch sever: %v", err)
+		panic(err)
+	}
+	logger.InitLogger(client)
+	
 	config.Connect()
 	router := gin.Default()
-
+	
 	// router.Use(cors.Default())
 	router.Use(middleware.CORSMiddleware())
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -52,15 +66,29 @@ func main() {
 	routes.AuthRoute(router)
 	routes.UserRoute(router)
 	routes.AdminRoute(router)
-	go func () {
-		if err := router.Run(":8080"); err != nil {
-			log.Fatalf("could not run sever: %v", err)
-		}
-	} ()
+
+
+	
+	if err := router.Run(":8080"); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"service": "server",
+		}).Fatalf("could not run sever: %v", err)
+		log.Fatalf("could not run sever: %v", err)
+	}
+	
+	
 	if err := pereodictasks.StartPereodicTasks(); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"service": "asynq",
+		}).Fatalf("could not run asynq sever: %v", err)
 		log.Fatalln(err)
 	}
+	
 	if err := config.StartRedis(); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"service": "redis",
+		}).Fatalf("could not run redis sever: %v", err)
 		log.Fatalln(err)
 	}
+	logger.Log.Info("All applications was started")
 }

@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/service"
 	"github.com/ilyaDyb/go_rest_api/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type AdminController struct {
@@ -33,11 +35,17 @@ func (ctrl *AdminController) UsersList(c *gin.Context) {
 
     users, err := ctrl.userService.GetAllUsers(limit, (page-1)*limit)
     if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "admin",
+        }).Errorf("failed to get all users with error: %v", err.Error())
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
         return
     }
     total, err := ctrl.userService.GetUsersCount()
     if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "admin",
+        }).Errorf("failed to get users count with error: %v", err.Error())
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users count"})
         return
     }
@@ -56,7 +64,10 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
     idStr := c.Param("id")
     id, err := strconv.Atoi(idStr)
     method := c.Request.Method
-    if err != nil && method != "POST"{
+    if err != nil && method != "POST" {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "admin",
+        }).Errorf("with error: %v", err.Error())
         c.AbortWithStatus(http.StatusBadRequest)
         return
     }
@@ -65,6 +76,9 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
     if method != "POST" {
         user, err = ctrl.userService.GetUserByID(uint(id))
         if err != nil {
+            logger.Log.WithFields(logrus.Fields{
+                "component": "admin",
+            }).Errorf("with error: %v", err.Error())
             c.AbortWithStatus(http.StatusInternalServerError)
             return
         }
@@ -74,6 +88,9 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
         c.JSON(http.StatusOK, user)
     case "DELETE":
         if err := ctrl.userService.DeleteUser(user); err != nil {
+            logger.Log.WithFields(logrus.Fields{
+                "component": "admin",
+            }).Errorf("with error: %v", err.Error())
             c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
             return
         }
@@ -92,10 +109,12 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
         var input ChangeProfileInput
         err := c.ShouldBindBodyWithJSON(&input)
         if err != nil {
-            log.Println(err.Error())
+            logger.Log.WithFields(logrus.Fields{
+                "component": "admin",
+            }).Errorf("with error: %v", err.Error())
             return
         }
-        log.Println(input)
+
         if input.Firstname != "" {
             user.Firstname = input.Firstname
         }
@@ -127,6 +146,9 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
         }
         log.Println(user)
         if err := ctrl.userService.UpdateUser(user); err != nil {
+            logger.Log.WithFields(logrus.Fields{
+                "component": "admin",
+            }).Errorf("with error: %v", err.Error())
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to update user profile"})
             return
         }
@@ -178,14 +200,18 @@ func (ctrl *AdminController) GetPutPostDeleteUser(c *gin.Context) {
         
         err = user.HashPassword(input.Password)
         if err != nil {
-            log.Println("Error hashing password:", err)
+            logger.Log.WithFields(logrus.Fields{
+                "component": "admin",
+            }).Errorf("failed to hash password error: %v", err.Error())
             c.Status(http.StatusInternalServerError)
             return
         }
         
         err = ctrl.userService.CreateUser(&user)
         if err != nil {
-            log.Println("Error creating user:", err)
+            logger.Log.WithFields(logrus.Fields{
+                "component": "admin",
+            }).Errorf("failed to create user with error: %v", err.Error())
             c.Status(http.StatusInternalServerError)
             return
         }
