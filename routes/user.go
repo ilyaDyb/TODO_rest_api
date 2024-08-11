@@ -22,9 +22,15 @@ func TestRoute(router *gin.Engine) {
 }
 func UserRoute(router *gin.Engine) {
 	db := config.DB
+
 	userRepo := repository.NewPostgresUserRepo(db)
-    userService := service.NewUserService(userRepo)
-    userController := controller.NewUserController(userService)
+	chatRepo := repository.NewPostgresChatRepo(db)
+
+	userService := service.NewUserService(userRepo)
+	chatService := service.NewChatService(chatRepo)
+
+	userController := controller.NewUserController(userService, chatService)
+
 	authorized := router.Group("/u")
 	authorized.Use(middleware.JWTAuthMiddleware())
 	{

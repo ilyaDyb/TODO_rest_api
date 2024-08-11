@@ -24,3 +24,13 @@ type UsersListResponse struct {
 	Users      []models.User        `json:"users"`
 	Pagination *pagination.PageInfo `json:"pagination"`
 }
+
+type ChatsListResponse struct { 
+	ChatID uint `json:"chat_id"`
+	Firstname string `json:"firstname"`
+	Lastname string `json:"lastname"`
+	Username string `json:"username"`
+	PhotoURL string `json:"photo_url"`
+	LastMessage string `json:"last_message"`
+	IsRead bool `json:"is_read"`
+}

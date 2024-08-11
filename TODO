@@ -8,7 +8,7 @@
 3. Search and selection of pairs
     + For now just give out profiles
     + Swipe functionality: Ability to swipe profiles (left or right), expressing interest or refusal.
-    - Add chat for 2 user which liked each other.
+    + Add chat for 2 user which liked each other.
     + Display users which liked me (current user) and add logic for response interaction.
     + Think about limit for unsubscribed users (10 for ex)
     + get profile without pagination
@@ -22,7 +22,13 @@
 6. User Interface and Experience (UI/UX)
     - Intuitive Design: Easy to use and attractive interface for improved user experience.
 
-7. Other:
+7. Chat:
+    + getting all chats for admin
+    + getting all chats for special user
+    + getting special chat between 2 users
+
+
+8. Other:
     + need return profile for current user if path have not this param
     + think about get user from token, not path
     + Fix bugs in EditProfileController

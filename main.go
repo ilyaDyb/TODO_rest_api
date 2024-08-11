@@ -65,6 +65,7 @@ func main() {
 	routes.TestRoute(router)
 	routes.AuthRoute(router)
 	routes.UserRoute(router)
+	routes.ChatRoute(router)
 	routes.AdminRoute(router)
 
 

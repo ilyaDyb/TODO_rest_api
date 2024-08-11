@@ -15,6 +15,9 @@ func StartPereodicTasks() error {
 	c := cron.New()
 	_, err := c.AddFunc("@every 10m", func() {
 		if err := deleteInactiveUsers(); err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"service": "cron",
+			}).Errorf("Error deleting inactive users: %v", err.Error())
 			log.Printf("Error deleting inactive users: %v", err)
 		} else {
 			log.Println("Inactive users deleted successfully")

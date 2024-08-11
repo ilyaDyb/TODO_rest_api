@@ -9,3 +9,96 @@
 {"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-06T17:12:16+03:00"}
 {"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-06T17:12:22+03:00"}
 {"component":"auth","level":"error","msg":"databse service could not find user by username: sadsad, with err: record not found","service":"gorm","time":"2024-08-06T17:18:02+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:05:49+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:11:00+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:11:23+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:25:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:27:05+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:27:43+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:29:46+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:32:07+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:33:43+03:00"}
+{"level":"fatal","msg":"could not run sever: listen tcp :8080: bind: address already in use","service":"server","time":"2024-08-08T22:33:43+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:34:48+03:00"}
+{"level":"fatal","msg":"could not run sever: listen tcp :8080: bind: address already in use","service":"server","time":"2024-08-08T22:34:49+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:35:07+03:00"}
+{"level":"fatal","msg":"could not run sever: listen tcp :8080: bind: address already in use","service":"server","time":"2024-08-08T22:35:07+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:35:34+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:37:10+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:38:36+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:39:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:40:32+03:00"}
+{"component":"chat","level":"info","msg":"route must be contain target username","time":"2024-08-08T22:41:07+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:42:41+03:00"}
+{"component":"chat","level":"info","msg":"route must be contain target username","time":"2024-08-08T22:42:51+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:45:24+03:00"}
+{"component":"chat","level":"error","msg":"chat not found with error: record not found","time":"2024-08-08T22:45:37+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T22:46:56+03:00"}
+{"component":"chat","level":"error","msg":"server could not create chat with error: record not found","time":"2024-08-08T22:55:54+03:00","user1_id":51,"user2_id":1}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:01:40+03:00"}
+{"component":"chat","level":"error","msg":"chat not found with error: record not found","time":"2024-08-08T23:03:20+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:05:35+03:00"}
+{"component":"chat","level":"error","msg":"chat not found with error: record not found","time":"2024-08-08T23:06:03+03:00"}
+{"component":"user","level":"error","msg":"server could not create interaction with error: ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности \"idx_user_target\" (SQLSTATE 23505)","service":"gorm","target_id":1,"time":"2024-08-08T23:06:08+03:00","user_id":51}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:21:00+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:23:21+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:24:04+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:25:13+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:27:08+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:28:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:32:56+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:34:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:39:39+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-08T23:40:07+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T00:46:45+03:00"}
+{"component":"auth","level":"error","msg":"databse service could not find user by username: 136, with err: record not found","service":"gorm","time":"2024-08-09T00:48:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T00:57:57+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T00:58:29+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T22:40:42+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T22:45:25+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T22:46:40+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T22:47:37+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:01:16+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get messages with error: ОШИБКА: отношение \"messages\" не существует (SQLSTATE 42P01)","time":"2024-08-09T23:02:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:03:01+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:24:18+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:32:55+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:33:51+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:35:36+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:39:35+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: wicki with error: ОШИБКА: столбец \"sender_id\" не существует (SQLSTATE 42703)","time":"2024-08-09T23:39:44+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:40:38+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: wicki with error: ОШИБКА: столбец \"sender_id\" не существует (SQLSTATE 42703)","time":"2024-08-09T23:41:07+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:42:33+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:43:00+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:50:57+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: wicki with error: Messages: unsupported relations for schema Chat","time":"2024-08-09T23:51:58+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:52:24+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:54:13+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:54:38+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: wicki with error: Message: unsupported relations for schema Chat","time":"2024-08-09T23:54:40+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-09T23:57:24+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T00:06:35+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T00:11:35+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: wicki with error: invalid field found for struct ()'s field User: define a valid foreign key for relations or implement the Valuer/Scanner interface","time":"2024-08-10T00:11:40+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T00:13:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T00:13:50+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T00:15:43+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T12:41:52+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: таблица \"m\" отсутствует в предложении FROM (SQLSTATE 42P01)","time":"2024-08-10T12:42:41+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T12:43:07+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: ошибка синтаксиса (примерное положение: \"messages\") (SQLSTATE 42601)","time":"2024-08-10T12:43:09+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T12:45:12+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: таблица \"m\" отсутствует в предложении FROM (SQLSTATE 42P01)","time":"2024-08-10T12:45:15+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: таблица \"m\" отсутствует в предложении FROM (SQLSTATE 42P01)","time":"2024-08-10T12:45:40+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T12:47:43+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: столбец last_messages.last_message_time не существует (SQLSTATE 42703)","time":"2024-08-10T12:47:50+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T12:49:37+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: столбец last_messages.created_at не существует (SQLSTATE 42703)","time":"2024-08-10T12:49:43+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:04:18+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: ОШИБКА: столбец chats.participant1_id не существует (SQLSTATE 42703)","time":"2024-08-10T13:04:23+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:07:21+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:11:49+03:00"}
+{"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: invalid field found for struct ()'s field Chat: define a valid foreign key for relations or implement the Valuer/Scanner interface","time":"2024-08-10T13:11:52+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:54:37+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:58:59+03:00"}

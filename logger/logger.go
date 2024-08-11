@@ -21,10 +21,10 @@ func InitLogger(client *elasticsearch.Client) {
 		Compress: true,
 	})
 	log.SetFormatter(&logrus.JSONFormatter{})
-	log.SetLevel(logrus.InfoLevel)
-	log.SetLevel(logrus.FatalLevel)
+	// log.SetLevel(logrus.InfoLevel)
+	// log.SetLevel(logrus.FatalLevel)
 	log.SetLevel(logrus.DebugLevel)
-	log.SetLevel(logrus.ErrorLevel)
+	// log.SetLevel(logrus.ErrorLevel)
 
 	hook := NewElasticsearchHook(client, "logs")
 	log.AddHook(hook)

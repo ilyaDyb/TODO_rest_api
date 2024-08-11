@@ -55,6 +55,10 @@ func (s *UserService) AddUserInteraction(interaction *models.UserInteraction) er
     return s.repo.AddUserInteraction(interaction)
 }
 
+func (s *UserService) GetUserInteraction(userID, targetID uint) (*models.UserInteraction, error) {
+    return s.repo.GetUserInteraction(userID, targetID)
+}
+
 func (s *UserService) GetUserInteractionsCount(userID uint) (int64, error) {
     return s.repo.GetUserInteractionsCount(userID)    
 }

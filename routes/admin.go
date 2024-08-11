@@ -11,14 +11,22 @@ import (
 func AdminRoute(route *gin.Engine) {
 	adminGroup := route.Group("/admin")
 	db := config.DB
+
 	adminRepo := repository.NewPostgresUserRepo(db)
+	chatRepo := repository.NewPostgresChatRepo(db)
+
 	adminService := service.NewUserService(adminRepo)
-	adminController := controller.NewAdminController(adminService)
+	chatService := service.NewChatService(chatRepo)
+
+	adminController := controller.NewAdminController(adminService, chatService)
 	{
 		adminGroup.GET("/users", adminController.UsersList)
-		adminGroup.GET("/user/:id", adminController.GetPutPostDeleteUser)
-		adminGroup.POST("/user", adminController.GetPutPostDeleteUser)
-		adminGroup.PUT("/user/:id", adminController.GetPutPostDeleteUser)
-		adminGroup.DELETE("/user/:id", adminController.GetPutPostDeleteUser)
+		adminGroup.GET("/user/:id", adminController.GetUser)
+		adminGroup.POST("/user", adminController.CreateUser)
+		adminGroup.PUT("/user/:id", adminController.UpdateUser)
+		adminGroup.DELETE("/user/:id", adminController.DeleteUser)
+		
+		// adminGroup
+		adminGroup.GET("/chats", adminController.GetAllChats)
 	}
 }

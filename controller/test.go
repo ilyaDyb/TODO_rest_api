@@ -123,9 +123,9 @@ func TestQueries(c *gin.Context) {
 	// config.DB.Model(models.User{}).Where("username = ?", "wicki").Update("is_active", true)
 
 	// All users with their photos
-	var allUsers []models.User
-	config.DB.Preload("Photo").Find(&allUsers)
-	c.JSON(200, allUsers)
+	// var allUsers []models.User
+	// config.DB.Preload("Photo").Find(&allUsers)
+	// c.JSON(200, allUsers)
 	// for _, usr := range allUsers {
 	// 	usr.Sex = "male"
 	// 	config.DB.Save(&usr)
@@ -233,5 +233,13 @@ func TestQueries(c *gin.Context) {
 	// 	user.HashPassword(user.Password)
 	// 	config.DB.Create(&user)
 	// }
+
+	//get all chats
+	var chats []models.Chat
+	config.DB.Model(&models.Chat{}).
+		Preload("User1.Photo", "is_preview = ?", true).
+		Preload("User2.Photo", "is_preview = ?", true).
+		Find(&chats)
+	c.JSON(http.StatusOK, chats)
 	return
 }

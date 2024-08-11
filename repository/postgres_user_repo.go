@@ -139,6 +139,14 @@ func (repo *PostgresUserRepo) GetUserInteractionsCount(userID uint) (int64, erro
 	return userInteractionsCount, nil
 }
 
+func (repo *PostgresUserRepo) GetUserInteraction(userID, targetID uint) (*models.UserInteraction, error) {
+	var userInteraction models.UserInteraction
+	if err := config.DB.Model(&models.UserInteraction{}).Where("user_id = ? AND target_id = ?").First(&userInteraction).Error; err != nil {
+		return nil, err
+	}
+	return &userInteraction, nil 
+}
+
 func (repo *PostgresUserRepo) UserIsExists(username string, email string) (bool, error){
 	query := "SELECT EXISTS (SELECT 1 FROM users WHERE username = ? OR email = ?)"
 	var exists bool

@@ -22,10 +22,14 @@ import (
 
 type UserController struct {
 	userService service.UserService
+	chatService service.ChatService
 }
 
-func NewUserController(userService service.UserService) *UserController {
-	return &UserController{userService: userService}
+func NewUserController(userService service.UserService, chatService service.ChatService) *UserController {
+	return &UserController{
+		userService: userService,
+		chatService: chatService,
+	}
 }
 
 // @Summary  User profile
@@ -475,6 +479,26 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	interaction.TargetID = targetId
 	interaction.UserID = user.ID
 	interaction.InteractionType = InterType
+
+	if InterType == "like" {
+		var reverseInteraction models.UserInteraction
+		if err := config.DB.Where("user_id = ? AND target_id = ? AND interaction_type = ?", targetId, user.ID, "like").First(&reverseInteraction).Error; err == nil {
+			chat := models.Chat{
+				User1ID: user.ID,
+				User2ID: targetId,
+			}
+			err := ctrl.chatService.CreateChat(&chat)
+			if err != nil {
+				logger.Log.WithFields(logrus.Fields{
+					"component": "chat",
+					"user1_id": user.ID,
+					"user2_id": targetId,
+				}).Errorf("server could not create chat with error: %v", err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "server could not create chat"})
+				return
+			}
+		}
+	}
 	if err := config.DB.Create(&interaction).Error; err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"component": "user",

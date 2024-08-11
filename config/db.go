@@ -45,6 +45,8 @@ func Connect() {
         &models.User{},
         &models.Photo{},
         &models.UserInteraction{},
+        &models.Chat{},
+        &models.Message{},
     )
 }
 
