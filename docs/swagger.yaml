@@ -101,6 +101,19 @@ definitions:
     - sex
     - username
     type: object
+  controller.SendMessageInput:
+    properties:
+      chat_id:
+        type: integer
+      message:
+        type: string
+      receiver_id:
+        type: integer
+    required:
+    - chat_id
+    - message
+    - receiver_id
+    type: object
   models.User:
     type: object
   utils.ErrorResponse:
@@ -529,6 +542,46 @@ paths:
               type: string
             type: object
       summary: Get a chat between two users
+      tags:
+      - chat
+  /chats/message:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint allows an authenticated user to send a message in
+        a specific chat.
+      parameters:
+      - description: With the Bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Message input data
+        in: body
+        name: SendMessageInput
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SendMessageInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Message sent successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input data
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Failed to create the message
+          schema:
+            type: string
+      summary: Send a message in a chat
       tags:
       - chat
   /u/get-profiles:

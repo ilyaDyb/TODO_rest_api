@@ -24,8 +24,20 @@
 
 7. Chat:
     + getting all chats for admin
-    + getting all chats for special user
+    - getting all chats for special user
+        - extend response
+        
     + getting special chat between 2 users
+
+    - messanger:
+        - async trading messages using websocket
+            + simple ws logic (ws v0.0.1) very simple messanging
+            - complex ws logic (ws v1.0.0) more complex functions such as async creating messages, limitation count of clients in hub and other
+        + sync trading messages without websocket
+
+        - update status of messages from is_read=false to is_read=true using queue tasks
+
+        - extend message model that to send photos, videos (not requiered)
 
 
 8. Other:

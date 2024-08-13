@@ -102,3 +102,72 @@
 {"component":"chat","level":"error","msg":"Failed to get chats for special user: test136 with error: invalid field found for struct ()'s field Chat: define a valid foreign key for relations or implement the Valuer/Scanner interface","time":"2024-08-10T13:11:52+03:00"}
 {"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:54:37+03:00"}
 {"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-10T13:58:59+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T19:45:51+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:25:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:27:25+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:29:10+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:32:06+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:41:45+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:47:01+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:47:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T20:53:58+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:02:03+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:03:04+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:03:45+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:06:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:07:11+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:09:01+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-11T21:09:58+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-12T15:23:21+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-12T15:31:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-12T15:51:04+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-13T23:01:32+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-13T23:07:27+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-13T23:35:22+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:15:09+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:16:27+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:20:25+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:20:26+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:20:28+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:21:44+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client disconnected: ","time":"2024-08-14T00:21:44+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:21:51+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:21:52+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:22:54+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:22:55+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:23:19+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:24:32+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:24:33+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:24:37+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:25:44+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:25:44+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client disconnected: ","time":"2024-08-14T00:25:44+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:25:46+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:26:22+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:26:25+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:26:27+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:29:04+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:29:09+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:29:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:29:57+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: ","time":"2024-08-14T00:29:58+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:30:49+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 1","time":"2024-08-14T00:30:49+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client disconnected: ","time":"2024-08-14T00:30:49+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:30:56+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:30:57+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:31:11+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 1","time":"2024-08-14T00:31:17+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:32:58+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 0.8274451868699007","time":"2024-08-14T00:33:00+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 0.493059367411399","time":"2024-08-14T00:33:07+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:34:00+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 0.13875185676630242","time":"2024-08-14T00:34:00+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client disconnected: 0.493059367411399","time":"2024-08-14T00:34:00+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:34:01+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:34:10+03:00"}
+{"level":"info","msg":"Postgres was started successfully","service":"postgres","time":"2024-08-14T00:34:17+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 0.44621023113083624","time":"2024-08-14T00:34:20+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client connected: 0.898462328962581","time":"2024-08-14T00:34:23+03:00"}
+{"component":"websocket_chat","level":"error","msg":"error reading message: websocket: close 1001 (going away)","time":"2024-08-14T00:34:34+03:00"}
+{"component":"websocket_chat","level":"info","msg":"Client disconnected: 0.898462328962581","time":"2024-08-14T00:34:34+03:00"}

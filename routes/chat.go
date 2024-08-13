@@ -25,5 +25,6 @@ func ChatRoute(router *gin.Engine) {
 	{
 		chatGroup.GET("", chatController.GetChatsForSpecUser)
 		chatGroup.GET("/:username", chatController.ChatController)
+		chatGroup.POST("/message", chatController.SendMessage)
 	}
 }

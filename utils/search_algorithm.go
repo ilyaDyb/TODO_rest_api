@@ -11,9 +11,8 @@ import (
 
 func CalculateScore(user1, user2 models.User) float64 {
 	const (
-		interestsWeight = 0.2
-		distanceWeight = 0.4
-		cityWeight = 0.4
+		distanceWeight = 0.5
+		cityWeight = 0.5
 	)
 	user1Hobbies := strings.Split(user1.Hobbies, ",")
 	user2Hobbies := strings.Split(user2.Hobbies, ",")
@@ -25,18 +24,19 @@ func CalculateScore(user1, user2 models.User) float64 {
 			}
 		}
 	}
-	interestsScore := float64(intersection) / float64(len(user1Hobbies))
+	
 	distance := haversine(
 		float64(user1.Lat), float64(user1.Lon), float64(user2.Lat), float64(user2.Lon),
 	)
+	// log.Println(distance)
 	distanceScore := math.Max(0, 1-distance/50)
 	cityScore := 0.0
-	if user1.City == user2.City {
+	if strings.EqualFold(strings.ToLower(user1.City), strings.ToLower(user2.City)) {
 		cityScore = 1.0
 	}
 
-	totalScore := interestsWeight*interestsScore + distanceWeight*distanceScore + cityWeight*cityScore
-	log.Println(totalScore)
+	totalScore :=  distanceWeight*distanceScore + cityWeight*cityScore
+	log.Println(user2.Username,totalScore)
 	return totalScore
 }
 

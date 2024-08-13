@@ -574,6 +574,65 @@
                 }
             }
         },
+        "/chats/message": {
+            "post": {
+                "description": "This endpoint allows an authenticated user to send a message in a specific chat.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Send a message in a chat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "With the Bearer started",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Message input data",
+                        "name": "SendMessageInput",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.SendMessageInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message sent successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create the message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/chats/{username}": {
             "get": {
                 "description": "Get a chat between the current user and the target user",
@@ -1179,6 +1238,25 @@
                 "username": {
                     "type": "string",
                     "maxLength": 50
+                }
+            }
+        },
+        "controller.SendMessageInput": {
+            "type": "object",
+            "required": [
+                "chat_id",
+                "message",
+                "receiver_id"
+            ],
+            "properties": {
+                "chat_id": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "receiver_id": {
+                    "type": "integer"
                 }
             }
         },

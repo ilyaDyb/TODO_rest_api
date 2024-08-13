@@ -8,10 +8,7 @@ import (
 
 	// "github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
-	"github.com/ilyaDyb/go_rest_api/models"
 
-	// "github.com/ilyaDyb/go_rest_api/models"
-	// "github.com/ilyaDyb/go_rest_api/models"
 	// "github.com/ilyaDyb/go_rest_api/utils"
 
 	"github.com/gin-gonic/gin"
@@ -235,11 +232,27 @@ func TestQueries(c *gin.Context) {
 	// }
 
 	//get all chats
-	var chats []models.Chat
-	config.DB.Model(&models.Chat{}).
-		Preload("User1.Photo", "is_preview = ?", true).
-		Preload("User2.Photo", "is_preview = ?", true).
-		Find(&chats)
-	c.JSON(http.StatusOK, chats)
+	// var chats []models.Chat
+	// config.DB.Model(&models.Chat{}).
+	// 	Preload("User1.Photo", "is_preview = ?", true).
+	// 	Preload("User2.Photo", "is_preview = ?", true).
+	// 	Find(&chats)
+	// c.JSON(http.StatusOK, chats)
+	
+	// set equal values lat lon for all users for testing search alg
+	// 1
+	// var query string
+	// for i := 3; i <= 116; i++ {
+	// 	query = fmt.Sprintf(
+	// 		"UPDATE users SET lat=42.5325, lon=42.5325 WHERE id=%v", i,
+	// 	)
+	// 	err := config.DB.Exec(query).Error
+	// 	if err != nil {
+	// 		fmt.Println(err.Error())
+	// 	} else {
+	// 		fmt.Println("all good")
+	// 	}
+
+	// }
 	return
 }

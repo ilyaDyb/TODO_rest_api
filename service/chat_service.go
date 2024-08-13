@@ -18,6 +18,10 @@ func (s *ChatService) CreateChat(chat *models.Chat) error {
 	return s.repo.CreateChat(chat)
 }
 
+func (s *ChatService) CreateMessage(message *models.Message) error {
+	return s.repo.CreateMessage(message)
+}
+
 func (s *ChatService) GetAllChats() (*[]models.Chat, error) {
 	return s.repo.GetAllChats()
 }

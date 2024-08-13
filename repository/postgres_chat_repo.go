@@ -19,6 +19,10 @@ func (repo *PostgresChatRepo) CreateChat(user *models.Chat) error {
 	return repo.db.Create(user).Error
 }
 
+func (repo *PostgresChatRepo) CreateMessage(message *models.Message) error {
+	return repo.db.Create(message).Error
+}
+
 func (repo *PostgresChatRepo) GetAllChats() (*[]models.Chat, error) {
 	var chats []models.Chat
 	if err := repo.db.Model(models.Chat{}).
@@ -135,17 +139,17 @@ func (repo *PostgresChatRepo) GetUserChats(userID uint) (*[]utils.ChatsListRespo
 	var results []utils.ChatsListResponse
 
 	query := `
-	SELECT users.firstname, users.lastname, users.username, photos.url, messages.content AS last_message, messages.is_read, chats.id AS chat_id
-		FROM chats
+		SELECT chats.id AS chat_id, users.username, users.firstname, users.lastname, photos.url, messages.content AS last_message,
+		messages.is_read, sender.username AS sender_username FROM chats
 		JOIN users ON (users.id = chats.user1_id OR users.id = chats.user2_id)
 		LEFT JOIN photos ON photos.user_id = users.id AND photos.is_preview = true
-		LEFT JOIN 
-			messages ON messages.chat_id = chats.id AND messages.created_at = (
-			SELECT MAX(created_at) 
-			FROM messages 
+		LEFT JOIN messages ON messages.chat_id = chats.id AND messages.created_at = (
+			SELECT MAX(created_at)
+			FROM messages
 			WHERE chat_id = chats.id
 		)
-		WHERE (chats.user1_id = ? OR chats.user2_id = ?) AND users.id != ?;
+		LEFT JOIN users AS sender ON sender.id = messages.sender_id
+		WHERE (chats.user1_id = ? OR chats.user2_id = ?) AND users.id != ?
 	`
 	err := repo.db.Raw(query, userID, userID, userID).Find(&results).Error
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 	"github.com/ilyaDyb/go_rest_api/middleware"
 	"github.com/ilyaDyb/go_rest_api/pereodictasks"
 	"github.com/ilyaDyb/go_rest_api/routes"
+	"github.com/ilyaDyb/go_rest_api/ws"
 	"github.com/sirupsen/logrus"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -68,7 +69,8 @@ func main() {
 	routes.ChatRoute(router)
 	routes.AdminRoute(router)
 
-
+	ws.RegisterWsRoutes(router)
+	go ws.HubInstance.Run()
 	
 	if err := router.Run(":8080"); err != nil {
 		logger.Log.WithFields(logrus.Fields{

@@ -35,7 +35,7 @@ func StartRedis() error {
 
 	mux := asynq.NewServeMux()
 	mux.HandleFunc("email:deliver", tasks.HandleEmailDeliveryTask)
-
+	
 	if err := srv.Run(mux); err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"service": "async",

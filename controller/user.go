@@ -483,6 +483,19 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 	if InterType == "like" {
 		var reverseInteraction models.UserInteraction
 		if err := config.DB.Where("user_id = ? AND target_id = ? AND interaction_type = ?", targetId, user.ID, "like").First(&reverseInteraction).Error; err == nil {
+			interaction.IsRelevant = false
+			reverseInteraction.IsRelevant = false
+			if err := config.DB.Save(&reverseInteraction).Error; err != nil {
+				logger.Log.WithFields(logrus.Fields{
+                    "component": "user",
+                    "service":   "gorm",
+                    "target_id": reverseInteraction.TargetID,
+                    "user_id":   reverseInteraction.UserID,
+                }).Errorf("server could not update reverse interaction with error: %v", err.Error())
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "server could not update reverse interaction"})
+                return
+			}
+
 			chat := models.Chat{
 				User1ID: user.ID,
 				User2ID: targetId,
@@ -497,6 +510,8 @@ func (ctrl *UserController) GradeProfileController(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "server could not create chat"})
 				return
 			}
+		} else {
+			interaction.IsRelevant = true
 		}
 	}
 	if err := config.DB.Create(&interaction).Error; err != nil {

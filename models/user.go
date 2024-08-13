@@ -55,6 +55,7 @@ type UserInteraction struct {
 	UserID          uint   `json:"user_id"`
 	TargetID        uint   `json:"target_id"`
 	InteractionType string `json:"interaction_type"`
+	IsRelevant      bool   `json:"is_relevant" gorm:"default:1"`
 }
 
 type TemporaryUser struct {

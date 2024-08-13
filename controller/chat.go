@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ilyaDyb/go_rest_api/logger"
+	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/service"
 	"github.com/sirupsen/logrus"
 )
@@ -123,4 +124,67 @@ func (ctrl *ChatController) GetChatsForSpecUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, chats)
+}
+
+
+type SendMessageInput struct {
+	ChatID     uint   `json:"chat_id" binding:"required"`
+	ReceiverID uint   `json:"receiver_id" binding:"required"`
+	Message    string `json:"message" binding:"required"`
+}
+
+// SendMessage godoc
+// @Summary Send a message in a chat
+// @Description This endpoint allows an authenticated user to send a message in a specific chat.
+// @Tags chat
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "With the Bearer started"
+// @Param SendMessageInput body SendMessageInput true "Message input data"
+// @Success 200 {string} string "Message sent successfully"
+// @Failure 400 {object} string "Invalid input data"
+// @Failure 404 {object} string "User not found"
+// @Failure 500 {object} string "Failed to create the message"
+// @Router /chats/message [post]
+func (ctrl *ChatController) SendMessage(c *gin.Context) {
+	var input SendMessageInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "chat",
+		}).Errorf("Failed to receive data from client: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data"})
+		return
+	}
+
+	username := c.MustGet("username").(string)
+	user, err := ctrl.userService.GetUserByUsername(username)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "chat",
+			"username":  username,
+		}).Errorf("User not found: %v", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	message := models.Message{
+		ChatID:    input.ChatID,
+		SenderID:  user.ID,
+		ReceiverID: input.ReceiverID,
+		Content:   input.Message,
+		IsRead:    false,
+	}
+
+	if err := ctrl.chatService.CreateMessage(&message); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"component": "chat",
+			"chat_id":   input.ChatID,
+			"sender_id": user.ID,
+			"receiver_id": input.ReceiverID,
+		}).Errorf("Failed to create message: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the message"})
+		return 
+	}
+
+	c.Status(http.StatusOK)
 }

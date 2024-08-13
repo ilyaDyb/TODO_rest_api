@@ -79,7 +79,7 @@ func (repo *PostgresUserRepo) SaveLocation(username string, lat float32, lon flo
 
 func (repo *PostgresUserRepo) GetUsersWhoLikedMe(userID uint) ([]models.User, error) {
     var usersIdsWhichLikedMe []uint
-    if err := repo.db.Model(&models.UserInteraction{}).Where("target_id = ?", userID).Pluck("user_id", &usersIdsWhichLikedMe).Error; err != nil {
+    if err := repo.db.Model(&models.UserInteraction{}).Where("target_id = ? AND is_relevant = ?", userID, true).Pluck("user_id", &usersIdsWhichLikedMe).Error; err != nil {
         return nil, err
     }
 

@@ -11,9 +11,13 @@ type ChatRepo interface {
 
 	//for other controllers
 	CreateChat(chat *models.Chat) error 
+	CreateMessage(message *models.Message) error
+
 	GetChatByUsernames(username1, username2 string) (*models.Chat, error)
 	GetMessagesByIDChat(chatID uint) (*[]models.Message, error)
 	GetUserChats(userID uint) (*[]utils.ChatsListResponse, error)
+	
+	
 	// GetChatsForSpecUser(userID uint) ([]struct {
 	// 	User              models.User
 	// 	LastMessage       string
