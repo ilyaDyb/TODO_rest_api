@@ -14,7 +14,7 @@
     + get profile without pagination
     + get profile with pagination
 4. User interaction
-    - Messages: Built-in messaging system for communication between matched users (matches).
+    + Messages: Built-in messaging system for communication between matched users (matches).
     - Notifications: Push notifications and in-app notifications for new messages, matches and likes.
 5. Additional features
     + Geolocation: Using location to match nearby matches.
