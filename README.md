@@ -15,6 +15,7 @@ A full-featured Tinder-like application built with Go. This project includes use
 * Asynq
 * Elasticsearch
 * Kibana
+* docker-compose
 * Testing
 * Sqlite3
 * testify
