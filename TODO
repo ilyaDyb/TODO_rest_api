@@ -14,28 +14,25 @@
     + get profile without pagination
     + get profile with pagination
 4. User interaction
-    - Messages: Built-in messaging system for communication between matched users (matches).
+    + Messages: Built-in messaging system for communication between matched users (matches).
     - Notifications: Push notifications and in-app notifications for new messages, matches and likes.
 5. Additional features
     + Geolocation: Using location to match nearby matches.
     - Subscriptions and Premium Features: Paid features such as unlimited likes, the ability to see who has viewed a profile, and Rewind.
-6. User Interface and Experience (UI/UX)
-    - Intuitive Design: Easy to use and attractive interface for improved user experience.
-
-7. Chat:
+6. Chat:
     + getting all chats for admin
-    - getting all chats for special user
-        - extend response
+    + getting all chats for special user
+        + extend response
         
     + getting special chat between 2 users
 
-    - messanger:
-        - async trading messages using websocket
+    + messanger:
+        + async trading messages using websocket
             + simple ws logic (ws v0.0.1) very simple messanging
-            - complex ws logic (ws v1.0.0) more complex functions such as async creating messages, limitation count of clients in hub and other
+            + complex ws logic (ws v1.0.0) more complex functions such as async creating messages, limitation count of clients in hub and other
         + sync trading messages without websocket
 
-        - update status of messages from is_read=false to is_read=true using queue tasks
+        + update status of messages from is_read=false to is_read=true using queue tasks
 
         - extend message model that to send photos, videos (not requiered)
 
@@ -53,10 +50,9 @@
         2024/07/27 18:56:19 /home/wicki/.local/golang_projects/go_rest_api/utils/validators.go:30 record not found
         [0.536ms] [rows:0] SELECT * FROM "users" WHERE email = 'ilasdk@mail.ru' AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1
 
-    - Big work for location between different users:
+    + Big work for location between different users:
         + Then recruitment Engine: Algorithms that suggest users based on common interests, location, and other factors.
-        - I think the search algorithm is still a bit raw, so it needs to be tested and improved if necessary.
-
+        
     + validate users forms
     + add valid refresh token (JWT)
     + add tags for schemas swag
@@ -79,10 +75,10 @@
             + auth controllers
             + admin controllers
 
-    +- do very simple main.go file
+    - do very simple main.go file
 
     + add handler for drop password
-        - ...
+        + ...
 
     + make pereodic task for deleting user which has status is_active = false if different between now and CreatedAT >= 24 hours
 
@@ -91,6 +87,6 @@
 
     - add file for creating admin user (not required)
     - write tests with testDB sqlite mb
-    + add any service for storage and analysis logs (mb ELK - Logrus -> Elasticsearch -> Kibana)
     - make Dockerfile and docker-compose work
         + set up docker-compose for log services
+    + add any service for storage and analysis logs (mb ELK - Logrus -> Elasticsearch -> Kibana)

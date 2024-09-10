@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ilyaDyb/go_rest_api/config"
+	"github.com/ilyaDyb/go_rest_api/config/redis"
 	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/service"
@@ -137,7 +138,7 @@ func (ctrl *AuthController) RegistrationController(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	info, err := config.Client.Enqueue(task)
+	info, err := redis.Client.Enqueue(task)
 	if err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"component": "auth",
@@ -375,7 +376,7 @@ func (ctrl *AuthController) DropPasswordController(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	info, err := config.Client.Enqueue(task)
+	info, err := redis.Client.Enqueue(task)
 	if err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"component": "auth",
@@ -404,7 +405,7 @@ func (ctrl *AuthController) DropPasswordController(c *gin.Context) {
 	}
 	ID := strconv.Itoa(int(user.ID))
 
-	err = utils.SetCache(config.RedisClient, code, ID, time.Minute*3)
+	err = utils.SetCache(redis.RedisClient, code, ID, time.Minute*3)
 	if err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"component": "auth",
@@ -449,7 +450,7 @@ func (ctrl *AuthController) ChangePassword(c *gin.Context) {
 	}
 	log.Printf("Received code: %s, new password: %s\n", input.Code, input.NewPassword)
 
-	userID, err := utils.GetCache(config.RedisClient, input.Code)
+	userID, err := utils.GetCache(redis.RedisClient, input.Code)
 	if err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"component": "auth",

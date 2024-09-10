@@ -27,9 +27,9 @@ type Message struct {
 	Content    string `gorm:"type:text;not null" json:"content"`
 	IsRead     bool   `gorm:"default:false" json:"is_read"`
 
-	Chat     Chat `gorm:"foreignKey:ChatID;constraint:OnDelete:CASCADE;" json:"chat,omitempty"`
-	Sender   User `gorm:"foreignKey:SenderID;constraint:OnDelete:CASCADE;" json:"sender,omitempty"`
-	Receiver User `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE;" json:"receiver,omitempty"`
+	Chat     Chat `gorm:"foreignKey:ChatID;constraint:OnDelete:CASCADE;" json:"-"`
+	Sender   User `gorm:"foreignKey:SenderID;constraint:OnDelete:CASCADE;" json:"-"`
+	Receiver User `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 func (Message) TableName() string {

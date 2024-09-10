@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/utils"
 	"gorm.io/gorm"
@@ -156,4 +157,13 @@ func (repo *PostgresChatRepo) GetUserChats(userID uint) (*[]utils.ChatsListRespo
 		return nil, err
 	}
 	return &results, nil
+}
+
+func (repo *PostgresChatRepo) GetLastMessageByChatID(chatID uint) (*models.Message, error) {
+	var message models.Message
+	query := `SELECT * FROM messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT 1`
+	if err := config.DB.Raw(query, chatID).First(&message).Error; err != nil {
+		return nil, err
+	}
+	return &message, nil
 }

@@ -16,6 +16,7 @@ type ChatRepo interface {
 	GetChatByUsernames(username1, username2 string) (*models.Chat, error)
 	GetMessagesByIDChat(chatID uint) (*[]models.Message, error)
 	GetUserChats(userID uint) (*[]utils.ChatsListResponse, error)
+	GetLastMessageByChatID(chatID uint) (*models.Message, error)
 	
 	
 	// GetChatsForSpecUser(userID uint) ([]struct {

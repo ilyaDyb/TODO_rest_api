@@ -1,12 +1,15 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ilyaDyb/go_rest_api/config/redis"
 	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/models"
 	"github.com/ilyaDyb/go_rest_api/service"
+	"github.com/ilyaDyb/go_rest_api/tasks"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,43 +62,98 @@ func NewChatController(chatService service.ChatService, userService service.User
 // @Failure 400 {object} map[string]string
 // @Router /chats/{username} [get]
 func (ctrl *ChatController) ChatController(c *gin.Context) {
-	targetUsername := c.Param("username")
-	if targetUsername == "" {
-		logger.Log.WithFields(logrus.Fields{
-			"component": "chat",
-		}).Info("route must contain target username")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "route must contain target username"})
-		return
+    targetUsername := c.Param("username")
+    if targetUsername == "" {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "chat",
+        }).Info("route must contain target username")
+        c.JSON(http.StatusBadRequest, gin.H{"error": "route must contain target username"})
+        return
+    }
+
+    username := c.MustGet("username").(string)
+    if username == targetUsername {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "you can't join a chat with yourself"})
+        return
+    }
+
+    chat, err := ctrl.chatService.GetChatByUsernames(username, targetUsername)
+    if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "chat",
+        }).Errorf("chat not found with error: %v", err.Error())
+        c.JSON(http.StatusBadRequest, gin.H{"error": "chat not found"})
+        return
+    }
+
+    lastMessage, err := ctrl.chatService.GetLastMessageByChatID(chat.ID)
+    if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "chat",
+        }).Errorf("Failed to get last message with error: %v", err.Error())
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get last message"})
+        return
+    }
+
+    curUsr, err := ctrl.userService.GetUserByUsername(username)
+    if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "chat",
+        }).Errorf("Failed to get current user with error: %v", err.Error())
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get current user"})
+        return
+    }
+	log.Println(lastMessage.SenderID, curUsr.ID)
+    if lastMessage.SenderID != curUsr.ID {
+        // task, err := tasks.NewReadMessagesTask(chat.ID, curUsr.ID)
+		// log.Println(string(task.Payload()))
+        // if err != nil {
+        //     logger.Log.WithFields(logrus.Fields{
+        //         "component": "chat",
+        //     }).Errorf("Failed to create read messages task with error: %v", err.Error())
+        //     c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create read messages task"})
+        //     return
+        // }
+
+        // inf, err = redis.Client.Enqueue(task)
+		// if err != nil {
+		// 	log.Panicln(err.Error())
+		// }
+		// log.Println(inf)
+		task, err := tasks.NewReadMessagesTask(chat.ID, lastMessage.SenderID)
+		if err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"component": "chat",
+				"service":   "asynq",
+			}).Errorf("server could not start messages reader task with error: %v", err.Error())
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		info, err := redis.Client.Enqueue(task)
+		if err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"component": "chat",
+				"service":   "asynq",
+			}).Errorf("server could not start messages reader with error: %v", err.Error())
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
 	}
 
-	username := c.MustGet("username").(string)
-	if username == targetUsername {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "you can't join a chat with yourself"})
-		return
-	}
+    messages, err := ctrl.chatService.GetMessagesByIDChat(chat.ID)
+    if err != nil {
+        logger.Log.WithFields(logrus.Fields{
+            "component": "chat",
+        }).Errorf("Failed to get messages with error: %v", err.Error())
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
+        return
+    }
 
-	chat, err := ctrl.chatService.GetChatByUsernames(username, targetUsername)
-	if err != nil {
-		logger.Log.WithFields(logrus.Fields{
-			"component": "chat",
-		}).Errorf("chat not found with error: %v", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "chat not found"})
-		return
-	}
-	
-	messages, err := ctrl.chatService.GetMessagesByIDChat(chat.ID)
-	if err != nil {
-		logger.Log.WithFields(logrus.Fields{
-			"component": "chat",
-		}).Errorf("Failed to get messages with error: %v", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"chat_members": chat,
-		"messages": messages,
-	})
+    c.JSON(http.StatusOK, gin.H{
+        "chat_members": chat,
+        "messages": messages,
+    })
 }
 
 // ChatController godoc

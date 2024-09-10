@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/config"
+	"github.com/ilyaDyb/go_rest_api/config/redis"
 	_ "github.com/ilyaDyb/go_rest_api/docs"
 	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/middleware"
@@ -71,23 +72,26 @@ func main() {
 
 	ws.RegisterWsRoutes(router)
 	go ws.HubInstance.Run()
+
+	log.Println("Calling run server...")
+	go func() {
+		if err := router.Run(":8080"); err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"service": "server",
+			}).Fatalf("could not run sever: %v", err)
+			log.Fatalf("could not run sever: %v", err)
+		}
+	}()
 	
-	if err := router.Run(":8080"); err != nil {
-		logger.Log.WithFields(logrus.Fields{
-			"service": "server",
-		}).Fatalf("could not run sever: %v", err)
-		log.Fatalf("could not run sever: %v", err)
-	}
-	
-	
+	log.Println("Calling StartPereodicTasks...")
 	if err := pereodictasks.StartPereodicTasks(); err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"service": "asynq",
 		}).Fatalf("could not run asynq sever: %v", err)
 		log.Fatalln(err)
 	}
-	
-	if err := config.StartRedis(); err != nil {
+	log.Println("Calling StartRedis...")
+	if err := redis.StartRedis(); err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"service": "redis",
 		}).Fatalf("could not run redis sever: %v", err)

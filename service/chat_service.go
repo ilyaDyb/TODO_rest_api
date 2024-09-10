@@ -37,3 +37,7 @@ func (s *ChatService) GetMessagesByIDChat(chatID uint) (*[]models.Message, error
 func (s *ChatService) GetUserChats(userID uint) (*[]utils.ChatsListResponse, error) {
 	return s.repo.GetUserChats(userID)
 }
+
+func (s *ChatService) GetLastMessageByChatID(chatID uint) (*models.Message, error) {
+	return s.repo.GetLastMessageByChatID(chatID)
+}

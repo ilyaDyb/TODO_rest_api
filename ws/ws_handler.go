@@ -3,6 +3,7 @@ package ws
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -17,17 +18,34 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+
 func WsHandler(c *gin.Context) {
+	chatID := c.Param("chatID")
+	username := c.Param("username")
+
+	chatIDInt, err := strconv.Atoi(chatID)
+	if err != nil {
+		http.Error(c.Writer, "Invalid chat ID", http.StatusBadRequest)
+		return
+	}
+	chatIDUint := uint(chatIDInt)
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		http.Error(c.Writer, "Failed to upgrade to websocket", http.StatusBadRequest)
 		return
 	}
-	id := c.Query("id")
-	client := NewClient(id, conn)
-	log.Printf("Client was created with id: %v", id)
-	HubInstance.Register <- client
 
+	client := NewClient(chatIDUint, username, conn)
+	log.Printf("Client was created with username: %v and chatID: %v", username, chatIDUint)
+
+	if len(HubInstance.Chats[chatIDUint]) >= 2 {
+		client.Conn.WriteMessage(websocket.TextMessage, []byte("Chat is full"))
+		client.Conn.Close()
+		return
+	}
+
+	HubInstance.Register <- client
 
 	go client.ReadPump()
 	go client.WritePump()

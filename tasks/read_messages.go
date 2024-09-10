@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/hibiken/asynq"
+	"github.com/ilyaDyb/go_rest_api/config"
 	"github.com/ilyaDyb/go_rest_api/logger"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,6 +33,7 @@ func NewReadMessagesTask(chatID, userID uint) (*asynq.Task, error) {
 
 func HandleReadMessagesTask(ctx context.Context, t *asynq.Task) error {
 	var p ReadMessagesPayload
+	log.Println("HandleReadMessagesTask Was started")
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
         logger.Log.WithFields(logrus.Fields{
 			"service": "asynq",
@@ -37,6 +41,14 @@ func HandleReadMessagesTask(ctx context.Context, t *asynq.Task) error {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	//TODO
-	return fmt.Errorf("")
+	query := `
+		UPDATE messages SET is_read = true
+		WHERE chat_id = ? AND sender_id = ?
+	`
+	log.Println(p.ChatID, p.UserID)
+	if err := config.DB.Exec(query, p.ChatID, p.UserID).Error; err != nil {
+		return err
+	}
+	
+	return nil
 }

@@ -1,4 +1,4 @@
-package config
+package redis
 
 import (
 	"log"
@@ -6,9 +6,12 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/ilyaDyb/go_rest_api/logger"
 	"github.com/ilyaDyb/go_rest_api/tasks"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
+
+const RedisAddr = "localhost:6379"
 
 var (
 	Client *asynq.Client
@@ -35,7 +38,9 @@ func StartRedis() error {
 
 	mux := asynq.NewServeMux()
 	mux.HandleFunc("email:deliver", tasks.HandleEmailDeliveryTask)
+	mux.HandleFunc("messages:reader", tasks.HandleReadMessagesTask)
 	
+	log.Println("Starting Asynq server...")
 	if err := srv.Run(mux); err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"service": "async",
